@@ -10,6 +10,6 @@ import { ConfigService } from '../../projects/admin-dashboard/src/lib/services/c
 })
 export class AppComponent {
   constructor(private configService: ConfigService) {
-   this.configService.setApiKey('c69203dbdeaf88d28f3bfa28afeaff32965744f3d3ae6321b9eff6d198b1edfb');
+   this.configService.setApiKey('c27c4d94eea807f6400604d204574663d179418bda4a8fa8a1a8bad48ea0fe3c');
   }
 }

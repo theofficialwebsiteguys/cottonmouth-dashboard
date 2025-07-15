@@ -5,13 +5,7 @@
 export const environment = {
   production: false,
   apiUrl: 'http://localhost:3333/api',
-  venueId: '836944c298d40676',
-  flower_power_api_key: '564ee591-42df-46d9-91c0-ff3507e316ec',
-  aeropay_api_key: '016c0534-ff89-4626-b8a4-fdbe7fbe1f08',
-  aeropay_api_secret: '13322af3-39fb-462d-865c-9f238b248abd',
-  aeropay_url: "https://staging-api.aeropay.com",
-  aeropay_merchant_id: 1760,
-  db_api_key: 'c69203dbdeaf88d28f3bfa28afeaff32965744f3d3ae6321b9eff6d198b1edfb'
+  db_api_key: 'c27c4d94eea807f6400604d204574663d179418bda4a8fa8a1a8bad48ea0fe3c'
 };
 
 /*
