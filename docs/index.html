@@ -4,19 +4,31 @@
   <meta charset="utf-8">
   <title>CannaosDash</title>
 
-   <script>
-    const PASSWORD = 'cottonmouth2026';
+  <script>
+    (function () {
+      const PASSWORD = 'cottonmouth2026';
+      const AUTH_KEY = 'auth';
 
-    if (!localStorage.getItem('auth')) {
+      // If already authenticated, allow
+      if (localStorage.getItem(AUTH_KEY) === 'true') return;
+
+      // Block EVERYTHING until auth
       const entered = prompt('Enter password');
       if (entered === PASSWORD) {
-        localStorage.setItem('auth', 'true');
+        localStorage.setItem(AUTH_KEY, 'true');
+        // Reload so Angular boots normally
+        location.reload();
       } else {
-        document.documentElement.innerHTML = '<h1 style="text-align:center;margin-top:40vh">Access denied</h1>';
-        throw new Error('Blocked');
+        document.documentElement.innerHTML = `
+          <h1 style="text-align:center;margin-top:40vh">
+            Access denied
+          </h1>
+        `;
+        throw new Error('Access blocked');
       }
-    }
+    })();
   </script>
+
 
   <base href="/cottonmouth-dashboard/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
