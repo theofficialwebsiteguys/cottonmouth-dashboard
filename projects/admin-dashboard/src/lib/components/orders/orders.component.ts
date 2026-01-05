@@ -1,225 +1,203 @@
-import { AfterViewInit, Component, ViewChild } from '@angular/core';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatTabsModule } from '@angular/material/tabs';
-import { OrderDetailsComponent } from '../order-details/order-details.component';
-import { MatSort, MatSortModule } from '@angular/material/sort';
-import { DataService } from '../../services/data.service';
 import { saveAs } from 'file-saver';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatDatepickerModule } from '@angular/material/datepicker';
+
+import { DataService } from '../../services/data.service';
+import { OrderDetailsComponent } from '../order-details/order-details.component';
+import { MatCardModule } from '@angular/material/card';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSortModule } from '@angular/material/sort';
+import { MatTableModule } from '@angular/material/table';
+import { BaseChartDirective } from 'ng2-charts';
 
 @Component({
   selector: 'lib-orders',
   standalone: true,
-  imports: [CommonModule, MatTableModule, FormsModule, MatButtonModule, MatInputModule, MatIconModule, MatTabsModule, OrderDetailsComponent, MatSortModule, MatDatepickerModule, MatNativeDateModule, ],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatButtonModule,
+    MatIconModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    OrderDetailsComponent,
+    MatInputModule],
   templateUrl: './orders.component.html',
   styleUrl: './orders.component.scss'
 })
-export class OrdersComponent implements AfterViewInit {
-  @ViewChild(MatSort) sort!: MatSort;
+export class OrdersComponent implements OnInit {
   orders: any[] = [];
-  filteredOrders = new MatTableDataSource<any>([]);
+  filteredOrdersCache: any[] = [];
   selectedOrder: any = null;
 
-   // Metrics to display
-   topProduct: string = '';
-   topCategory: string = '';
-   topBrand: string = '';
-   totalOrders: number = 0;
-   totalAmount: number = 0;
-   avgOrderAmount: number = 0;
-   avgDailySales: number = 0;
-   avgWeeklySales: number = 0;
-   avgMonthlySales: number = 0;
- 
+  searchTerm = '';
+  customStartDate: Date | null = null;
+  customEndDate: Date | null = null;
 
-  orderColumns = ['id', 'pos_order_id', 'user_id', 'points_add', 'points_redeem', 'total_amount', 'createdAt'];
+  // Metrics
+  topProduct = '';
+  topCategory = '';
+  topBrand = '';
+  totalOrders = 0;
+  totalAmount = 0;
+  avgOrderAmount = 0;
+  avgDailySales = 0;
+  avgWeeklySales = 0;
+  avgMonthlySales = 0;
 
   constructor(private dataService: DataService) {}
 
   ngOnInit(): void {
     this.dataService.orders$.subscribe(orders => {
-      this.orders = orders;
-  
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-  
-      const todayOrders = orders.filter(order => {
-        const orderDate = new Date(order.createdAt);
-        orderDate.setHours(0, 0, 0, 0);
-        return orderDate.getTime() === today.getTime();
-      });
-  
-      this.filteredOrders.data = todayOrders;
-      this.filteredOrders.filterPredicate = this.createFilter();
-      this.calculateMetrics(); // consider also updating it to recalculate based on filtered data
+      this.orders = orders || [];
+      this.filteredOrdersCache = this.orders; // ← IMPORTANT
+      this.calculateMetrics();
     });
-  
-    // this.dataService.fetchOrdersData().subscribe();
   }
 
-  ngAfterViewInit() {
-    if (this.sort) {
-      this.filteredOrders.sort = this.sort;
-    }
+  /* =======================
+     FILTERED ORDERS (FINAL)
+  ======================= */
+  get filteredOrders(): any[] {
+    return this.filteredOrdersCache.filter(order =>
+      `${order.Customer?.fname ?? ''} 
+       ${order.Customer?.lname ?? ''} 
+       ${order.id} 
+       ${order.pos_order_id ?? ''}`
+        .toLowerCase()
+        .includes(this.searchTerm.toLowerCase())
+    );
   }
 
-  createFilter(): (data: any, filter: string) => boolean {
-    return (data, filter) => {
-      const dataStr = Object.keys(data)
-        .map(key => data[key])
-        .join(' ')
-        .toLowerCase();
-      return dataStr.includes(filter);
-    };
+  /* =======================
+     DATE RANGE APPLY
+  ======================= */
+  applyCustomRange() {
+    if (!this.customStartDate || !this.customEndDate) return;
+
+    const start = new Date(this.customStartDate);
+    const end = new Date(this.customEndDate);
+
+    start.setHours(0, 0, 0, 0);
+    end.setHours(23, 59, 59, 999);
+
+    this.filteredOrdersCache = this.orders.filter(order => {
+      const orderDate = new Date(order.createdAt);
+      return orderDate >= start && orderDate <= end;
+    });
   }
 
+  /* =======================
+     CLEAR RANGE (OPTIONAL)
+  ======================= */
+  clearRange() {
+    this.customStartDate = null;
+    this.customEndDate = null;
+    this.filteredOrdersCache = this.orders;
+  }
 
+  /* =======================
+     CSV EXPORT
+  ======================= */
   exportToCSV() {
-    const data = this.filteredOrders.filteredData.map(order => ({
+    const data = this.filteredOrders.map(order => ({
       ID: order.id,
-      "POS Order ID": order.pos_order_id,
-      "User ID": order.user_id,
-      "Points Added": order.points_add,
-      "Points Redeemed": order.points_redeem,
-      "Total Amount": `$${order.total_amount}`,
-      "Created At": new Date(order.createdAt).toLocaleString()
+      Customer: `${order.Customer?.fname ?? ''} ${order.Customer?.lname ?? ''}`,
+      POS: order.pos_order_id,
+      Status: order.status || 'Pending',
+      Total: order.total_amount,
+      Date: new Date(order.createdAt).toLocaleString()
     }));
 
-    const csvContent = this.convertToCSV(data);
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    if (!data.length) return;
+
+    const header = Object.keys(data[0]).join(',') + '\n';
+    const rows = data
+      .map(row => Object.values(row).map(v => `"${v}"`).join(','))
+      .join('\n');
+
+    const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });
     saveAs(blob, `Orders_${new Date().toISOString().slice(0, 10)}.csv`);
   }
 
-  filterByDate(date: Date) {
-    if (!date) return;
-  
-    const selectedDate = new Date(date);
-    selectedDate.setHours(0, 0, 0, 0);
-  
-    const filtered = this.orders.filter(order => {
-      const orderDate = new Date(order.createdAt);
-      orderDate.setHours(0, 0, 0, 0);
-      return orderDate.getTime() === selectedDate.getTime();
-    });
-  
-    this.filteredOrders.data = filtered;
-    this.calculateMetrics(); // optionally recalculate for the selected day
-  }
-  
-
-  /**
-   * Converts an array of objects into CSV format.
-   */
-  convertToCSV(objArray: any[]) {
-    const header = Object.keys(objArray[0]).join(',') + '\n';
-    const rows = objArray.map(obj => Object.values(obj).map(value => `"${value}"`).join(',')).join('\n');
-    return header + rows;
-  }
-
-
+  /* =======================
+     METRICS (UNCHANGED)
+  ======================= */
   calculateMetrics() {
-    const productCount: { [key: string]: number } = {};
-    const categoryCount: { [key: string]: number } = {};
-    const brandCount: { [key: string]: number } = {};
-    let totalSales = 0;
-    let orderDates: Date[] = [];
+    this.totalOrders = this.orders.length;
+    this.totalAmount = 0;
+
+    const productCount: any = {};
+    const categoryCount: any = {};
+    const brandCount: any = {};
 
     this.orders.forEach(order => {
-      orderDates.push(new Date(order.createdAt));
-      totalSales += parseFloat(order.total_amount);
-      this.totalOrders++;
+      this.totalAmount += Number(order.total_amount || 0);
 
-      order.items.forEach((item:any) => {
+      order.items?.forEach((item: any) => {
         productCount[item.title] = (productCount[item.title] || 0) + item.quantity;
         categoryCount[item.category] = (categoryCount[item.category] || 0) + item.quantity;
         brandCount[item.brand] = (brandCount[item.brand] || 0) + item.quantity;
       });
     });
 
-    this.totalAmount = totalSales;
-    this.avgOrderAmount = this.totalOrders ? this.totalAmount / this.totalOrders : 0;
+    this.avgOrderAmount =
+      this.totalOrders > 0 ? this.totalAmount / this.totalOrders : 0;
 
-    this.topProduct = Object.keys(productCount).reduce((a, b) => (productCount[a] > productCount[b] ? a : b), '');
-    this.topCategory = Object.keys(categoryCount).reduce((a, b) => (categoryCount[a] > categoryCount[b] ? a : b), '');
-    this.topBrand = Object.keys(brandCount).reduce((a, b) => (brandCount[a] > brandCount[b] ? a : b), '');
+    this.topProduct = this.getTopKey(productCount);
+    this.topCategory = this.getTopKey(categoryCount);
+    this.topBrand = this.getTopKey(brandCount);
 
     this.calculateSalesAverages();
   }
 
-  calculateSalesAverages() {
-    if (!this.orders.length) return;
-
-    // Convert order dates to Date objects
-    const ordersWithDates = this.orders.map((order: any) => ({
-        ...order,
-        date: new Date(order.createdAt),
-    }));
-
-    // Create a map to store total sales per unique day
-    const dailySalesMap = new Map<string, number>();
-    const weeklySalesMap = new Map<string, number>();
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    ordersWithDates.forEach(order => {
-        const orderDate = new Date(order.date);
-        orderDate.setHours(0, 0, 0, 0); // Normalize time for comparison
-        const dateKey = orderDate.toISOString().split("T")[0]; // Format: YYYY-MM-DD
-
-        // Sum up daily sales
-        dailySalesMap.set(dateKey, (dailySalesMap.get(dateKey) || 0) + order.total_amount);
-
-        // Determine the start of the week for each order
-        const weekStart = new Date(orderDate);
-        weekStart.setDate(orderDate.getDate() - orderDate.getDay()); // Get Sunday of the week
-        weekStart.setHours(0, 0, 0, 0);
-        const weekKey = weekStart.toISOString().split("T")[0]; // Format: YYYY-MM-DD
-
-        // Sum up weekly sales
-        weeklySalesMap.set(weekKey, (weeklySalesMap.get(weekKey) || 0) + order.total_amount);
-    });
-
-    // Calculate cumulative daily average
-    const totalDailySales = Array.from(dailySalesMap.values()).reduce((sum, value) => sum + value, 0);
-    const totalDays = dailySalesMap.size; // Number of unique days with sales
-    this.avgDailySales = totalDays > 0 ? totalDailySales / totalDays : 0;
-
-    // Calculate cumulative weekly average
-    const totalWeeklySales = Array.from(weeklySalesMap.values()).reduce((sum, value) => sum + value, 0);
-    const totalWeeks = weeklySalesMap.size; // Number of unique weeks with sales
-    this.avgWeeklySales = totalWeeks > 0 ? totalWeeklySales / totalWeeks : 0;
-
-    // Calculate cumulative monthly average
-    const monthlySalesMap = new Map<string, number>();
-
-    ordersWithDates.forEach(order => {
-        const orderDate = new Date(order.date);
-        const monthKey = `${orderDate.getFullYear()}-${orderDate.getMonth() + 1}`; // Format: YYYY-MM
-
-        // Sum up monthly sales
-        monthlySalesMap.set(monthKey, (monthlySalesMap.get(monthKey) || 0) + order.total_amount);
-    });
-
-    const totalMonthlySales = Array.from(monthlySalesMap.values()).reduce((sum, value) => sum + value, 0);
-    const totalMonths = monthlySalesMap.size; // Number of unique months with sales
-    this.avgMonthlySales = totalMonths > 0 ? totalMonthlySales / totalMonths : 0;
-}
-
-
-
-
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
-    this.filteredOrders.filter = filterValue;
+  getTopKey(map: any): string {
+    return Object.keys(map).reduce((a, b) => (map[a] > map[b] ? a : b), '');
   }
 
+  calculateSalesAverages() {
+    const daily = new Map<string, number>();
+    const weekly = new Map<string, number>();
+    const monthly = new Map<string, number>();
+
+    this.orders.forEach(order => {
+      const date = new Date(order.createdAt);
+      const dayKey = date.toISOString().split('T')[0];
+
+      daily.set(dayKey, (daily.get(dayKey) || 0) + order.total_amount);
+
+      const weekStart = new Date(date);
+      weekStart.setDate(date.getDate() - date.getDay());
+      const weekKey = weekStart.toISOString().split('T')[0];
+      weekly.set(weekKey, (weekly.get(weekKey) || 0) + order.total_amount);
+
+      const monthKey = `${date.getFullYear()}-${date.getMonth() + 1}`;
+      monthly.set(monthKey, (monthly.get(monthKey) || 0) + order.total_amount);
+    });
+
+    this.avgDailySales = this.avgFromMap(daily);
+    this.avgWeeklySales = this.avgFromMap(weekly);
+    this.avgMonthlySales = this.avgFromMap(monthly);
+  }
+
+  avgFromMap(map: Map<string, number>) {
+    const values = Array.from(map.values());
+    return values.length
+      ? values.reduce((a, b) => a + b, 0) / values.length
+      : 0;
+  }
+
+  /* =======================
+     UI ACTIONS
+  ======================= */
   selectOrder(order: any) {
     this.selectedOrder = order;
   }
@@ -227,5 +205,10 @@ export class OrdersComponent implements AfterViewInit {
   clearSelection() {
     this.selectedOrder = null;
   }
-  
+
+  get pendingTotal(): number {
+    return this.filteredOrdersCache
+      .filter(o => !o.status || o.status === 'pending')
+      .reduce((sum, o) => sum + Number(o.total_amount), 0);
+  }
 }

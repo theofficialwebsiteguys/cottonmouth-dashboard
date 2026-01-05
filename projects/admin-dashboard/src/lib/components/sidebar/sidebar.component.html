@@ -1,22 +1,69 @@
-<!-- sidebar.component.html -->
-<div class="logo-container">
-    <a [routerLink]="'/'"><img src="assets/logo.png" alt="Logo" /></a>
-  </div>
-  <mat-nav-list>
-    <mat-list-item routerLink="/dashboard/overview" (click)="linkClick()">
-      <i class="fa-solid fa-chart-simple"></i> <span class="list-item">Overview</span>
-    </mat-list-item>
-    <mat-list-item routerLink="/dashboard/orders" (click)="linkClick()">
-      <i class="fa-solid fa-cart-shopping"></i> <span class="list-item">Orders</span>
-    </mat-list-item>
-    <mat-list-item routerLink="/dashboard/budtender-sales" (click)="linkClick()">
-      <i class="fa-solid fa-user-tag"></i> <span class="list-item">Budtender Sales</span>
-    </mat-list-item>
-    <mat-list-item routerLink="/dashboard/users" (click)="linkClick()">
-      <i class="fa-solid fa-users"></i> <span class="list-item">Loyalty Members</span>
-    </mat-list-item>
-    <mat-list-item routerLink="/dashboard/tools" (click)="linkClick()">
-      <i class="fa-solid fa-toolbox"></i> <span class="list-item">Admin Controls</span>
-    </mat-list-item>
-  </mat-nav-list>
-  
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav
+    #sidenav
+    class="sidenav"
+    [mode]="isMobile ? 'over' : 'side'"
+    [opened]="!isMobile"
+  >
+    <!-- Brand -->
+    <div class="brand">
+      <img class="brand-logo" src="assets/logo.png" alt="Dashboard Logo" />
+      <div class="brand-meta">
+        <div class="brand-title">Admin</div>
+        <div class="brand-subtitle">Dashboard</div>
+      </div>
+    </div>
+
+    <!-- Nav -->
+    <nav class="nav">
+      <div class="nav-section-label">Overview</div>
+
+      <a
+        class="nav-item"
+        routerLink="/dashboard/overview"
+        routerLinkActive="active"
+        (click)="handleNavClick()"
+      >
+        <i class="fa-solid fa-chart-line"></i>
+        <span class="nav-text">Dashboard</span>
+      </a>
+
+      <a
+        class="nav-item"
+        routerLink="/dashboard/orders"
+        routerLinkActive="active"
+        (click)="handleNavClick()"
+      >
+        <i class="fa-solid fa-cart-shopping nav-icon"></i>
+        <span class="nav-text">Orders</span>
+      </a>
+
+      <a
+        class="nav-item"
+        routerLink="/dashboard/users"
+        routerLinkActive="active"
+        (click)="handleNavClick()"
+      >
+        <i class="fa-solid fa-users nav-icon"></i>
+        <span class="nav-text">Loyalty Members</span>
+      </a>
+
+      <div class="nav-divider"></div>
+      <div class="nav-section-label">Management</div>
+
+      <a
+        class="nav-item"
+        routerLink="/dashboard/tools"
+        routerLinkActive="active"
+        (click)="handleNavClick()"
+      >
+        <i class="fa-solid fa-toolbox nav-icon"></i>
+        <span class="nav-text">Admin Controls</span>
+      </a>
+    </nav>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="content">
+    <ng-content></ng-content>
+  </mat-sidenav-content>
+</mat-sidenav-container>

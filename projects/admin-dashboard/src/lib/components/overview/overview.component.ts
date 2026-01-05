@@ -612,7 +612,7 @@ generateCustomerRetentionTrend(users: any[], orders: any[]) {
   onMetricsRangeChange(range: string) {
     const now = new Date();
     let from = new Date();
-  
+
     switch (range) {
       case '30d':
         from.setDate(now.getDate() - 30);
@@ -620,14 +620,19 @@ generateCustomerRetentionTrend(users: any[], orders: any[]) {
       case '7d':
         from.setDate(now.getDate() - 7);
         break;
+      case 'custom':
+        return; // wait for Apply button
       case 'ytd':
       default:
-        from = new Date(now.getFullYear(), 0, 1); // Jan 1st
+        from = new Date(now.getFullYear(), 0, 1);
         break;
     }
-  
+
+    // 🔥 ONE RANGE → EVERYTHING
     this.filterMetricsData(from, now);
+    this.filterSalesData(from, now);
   }
+
   
   filterMetricsData(from: Date, to: Date) {
     const filtered = this.allOrders.filter(order => {

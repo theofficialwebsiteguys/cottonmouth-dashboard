@@ -1,209 +1,180 @@
-<div class="dashboard-container">
-    <!-- 🔹 Sales Overview Metrics -->
-   <div class="metrics-header-row">
-  <h2>Performance Metrics</h2>
-  <mat-form-field appearance="outline" class="range-dropdown">
-    <mat-label>Range</mat-label>
-    <mat-select [(value)]="selectedMetricsRange" (selectionChange)="onMetricsRangeChange($event.value)">
-      <mat-option value="ytd">Year to Date</mat-option>
-      <mat-option value="30d">Last 30 Days</mat-option>
-      <mat-option value="7d">Last 7 Days</mat-option>
-      <mat-option value="custom">Custom</mat-option>
-    </mat-select>
-  </mat-form-field>
-</div>
+<div class="overview-page">
 
-<div class="custom-range-fields" *ngIf="selectedMetricsRange === 'custom'">
-  <mat-form-field appearance="outline" class="date-field">
-    <input matInput [matDatepicker]="startPicker" placeholder="Start Date" [(ngModel)]="customStartDate">
-    <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
-    <mat-datepicker #startPicker></mat-datepicker>
-  </mat-form-field>
-
-  <mat-form-field appearance="outline" class="date-field">
-    <input matInput [matDatepicker]="endPicker" placeholder="End Date" [(ngModel)]="customEndDate">
-    <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
-    <mat-datepicker #endPicker></mat-datepicker>
-  </mat-form-field>
-
-  <button mat-stroked-button class="apply-btn" (click)="applyCustomRange()">Apply</button>
-</div>
-
-    
-    <div class="metrics-container">
-      <mat-card class="metric-card">
-        <mat-card-title>Total Sales</mat-card-title>
-        <mat-card-content class="metric-value">{{ totalRevenue | currency:'USD' }}</mat-card-content>
-      </mat-card>
-      <mat-card class="metric-card">
-        <mat-card-title>Total Orders</mat-card-title>
-        <mat-card-content class="metric-value">{{ totalOrders }}</mat-card-content>
-      </mat-card>
-      <mat-card class="metric-card">
-        <mat-card-title>Avg Daily Sales</mat-card-title>
-        <mat-card-content class="metric-value">{{ avgDailySales | currency:'USD' }}</mat-card-content>
-      </mat-card>
-      <mat-card class="metric-card">
-        <mat-card-title>Avg Order Value</mat-card-title>
-        <mat-card-content class="metric-value">{{ avgOrderValue | currency:'USD' }}</mat-card-content>
-      </mat-card>
-    </div>
-    
-
-    <div class="tab-navigation">
-      <button 
-        *ngFor="let tab of tabs; let i = index"
-        [class.active]="selectedTab === i"
-        (click)="selectedTab = i">
-        {{ tab }}
-      </button>
+  <!-- PAGE HEADER -->
+  <header class="overview-header">
+    <div>
+      <h1>Overview</h1>
+      <p class="subtitle">Sales, customers, and performance insights</p>
     </div>
 
-    <!-- 🟢 Overall Sales Tab -->
-    <div *ngIf="selectedTab === 0" class="tab-charts">
-      <!-- <div class="chart-header">
-        <h2>Sales Overview – Last 30 Days</h2>
-        <mat-form-field appearance="outline" class="range-selector">
-          <mat-label>Date Range</mat-label>
-          <mat-select [(value)]="selectedDateRange" (selectionChange)="onDateRangeChange($event.value)">
+    <!-- Controls group -->
+   <div class="header-controls">
+
+      <!-- RANGE GROUP -->
+      <div class="range-group">
+
+        <!-- RANGE SELECT -->
+        <mat-form-field appearance="outline" class="range-select">
+          <mat-label>Range</mat-label>
+          <mat-select
+            [(value)]="selectedMetricsRange"
+            (selectionChange)="onMetricsRangeChange($event.value)">
+            <mat-option value="ytd">Year to Date</mat-option>
             <mat-option value="30d">Last 30 Days</mat-option>
             <mat-option value="7d">Last 7 Days</mat-option>
             <mat-option value="custom">Custom</mat-option>
           </mat-select>
         </mat-form-field>
 
-        <div *ngIf="selectedMetricsRange === 'custom'" class="custom-range-picker">
-          <mat-form-field appearance="outline">
-            <mat-label>Start Date</mat-label>
-            <input matInput [matDatepicker]="startPicker" [(ngModel)]="customStartDate">
-            <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
-            <mat-datepicker #startPicker></mat-datepicker>
+        <div class="inline-dates" *ngIf="selectedMetricsRange === 'custom'">
+
+          <mat-form-field appearance="outline" class="range-input">
+            <mat-label>Date range</mat-label>
+
+            <mat-date-range-input [rangePicker]="picker">
+              <input
+                matStartDate
+                placeholder="Start"
+                [(ngModel)]="customStartDate"
+              />
+              <input
+                matEndDate
+                placeholder="End"
+                [(ngModel)]="customEndDate"
+              />
+            </mat-date-range-input>
+
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-date-range-picker #picker></mat-date-range-picker>
           </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>End Date</mat-label>
-            <input matInput [matDatepicker]="endPicker" [(ngModel)]="customEndDate">
-            <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
-            <mat-datepicker #endPicker></mat-datepicker>
-          </mat-form-field>
+          <button
+            mat-flat-button
+            color="primary"
+            class="apply-inline"
+            [disabled]="!customStartDate || !customEndDate"
+            (click)="applyCustomRange()">
+            Apply
+          </button>
 
-          <button mat-stroked-button color="primary" (click)="applyCustomRange()">Apply</button>
         </div>
 
-      </div> -->
 
-      <div class="chart-grid">
-        <mat-card class="chart-card">
-          <mat-card-title>Sales Over Time</mat-card-title>
-          <canvas baseChart [data]="salesChartData" [options]="chartOptions" [type]="'line'"></canvas>
-        </mat-card>
-
-        <mat-card class="chart-card">
-          <mat-card-title>Peak Sales Hours</mat-card-title>
-          <mat-card-subtitle>Most Active Shopping Times</mat-card-subtitle>
-          <canvas baseChart [data]="peakHoursChartData" [options]="chartOptions" [type]="'line'"></canvas>
-        </mat-card>
       </div>
     </div>
 
+  </header>
 
-    <!-- 🔵 Product Metrics Tab -->
-    <div *ngIf="selectedTab === 1">
-      <mat-card class="category-card">
-        <mat-card-title>Category Sales Breakdown
-          <button mat-stroked-button class="expand-btn" (click)="openProductBreakdownModal()">View All</button>
-        </mat-card-title>
-        <div class="chart-container">
-            <canvas baseChart [data]="categoryChartData" [options]="chartOptions" [type]="'pie'"></canvas>
+  <!-- KPI SUMMARY (affected by Metrics Range) -->
+  <section class="kpi-row">
+    <div class="kpi-card primary">
+      <span>Total Sales</span>
+      <strong>{{ totalRevenue | currency }}</strong>
+    </div>
+
+    <div class="kpi-card">
+      <span>Orders</span>
+      <strong>{{ totalOrders }}</strong>
+    </div>
+
+    <div class="kpi-card">
+      <span>Avg Daily Sales</span>
+      <strong>{{ avgDailySales | currency }}</strong>
+    </div>
+
+    <div class="kpi-card">
+      <span>Avg Order Value</span>
+      <strong>{{ avgOrderValue | currency }}</strong>
+    </div>
+  </section>
+
+  <!-- TABS -->
+  <nav class="segmented-tabs">
+    <button
+      *ngFor="let tab of tabs; let i = index"
+      [class.active]="selectedTab === i"
+      (click)="selectedTab = i">
+      {{ tab }}
+    </button>
+  </nav>
+
+  <!-- CONTENT SURFACE -->
+  <section class="content-surface">
+
+    <!-- OVERALL SALES (affected by Chart Range) -->
+    <div *ngIf="selectedTab === 0" class="chart-grid">
+      <div class="chart-card">
+        <div class="card-head">
+          <h3>Sales Over Time</h3>
+          <span class="hint">Charts follow “Chart Range”</span>
         </div>
-        <div class="top-5">
-            <ul class="top-list">
-                <mat-card-title>Top 5 Sold Products</mat-card-title>
-                <li *ngFor="let product of top5Products">{{ product.sales }} - {{ product.name }} </li>
-            </ul>
+        <div class="chart-wrap">
+          <canvas baseChart [data]="salesChartData" [options]="chartOptions" [type]="'line'"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="card-head">
+          <div>
+            <h3>Peak Sales Hours</h3>
+            <p class="chart-subtitle">Most active shopping times</p>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas baseChart [data]="peakHoursChartData" [options]="chartOptions" [type]="'line'"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUCT METRICS -->
+    <div *ngIf="selectedTab === 1" class="split-grid">
+      <div class="chart-card">
+        <div class="card-head">
+          <h3>Category Breakdown</h3>
+          <button mat-stroked-button (click)="openProductBreakdownModal()">View Full Breakdown</button>
+        </div>
+        <div class="chart-wrap small">
+          <canvas baseChart [data]="categoryChartData" [options]="chartOptions" [type]="'pie'"></canvas>
+        </div>
+      </div>
+
+      <div class="list-card">
+        <div class="card-head">
+          <h3>Top Products</h3>
+          <span class="hint">Units sold</span>
         </div>
 
-    </mat-card>
+        <ul class="top-list">
+          <li *ngFor="let product of top5Products">
+            <span class="name">{{ product.name }}</span>
+            <strong class="val">{{ product.sales }}</strong>
+          </li>
+        </ul>
+      </div>
     </div>
 
-    <!-- 🟣 Loyalty User Metrics Tab -->
-    <div *ngIf="selectedTab === 2">
-      <mat-card class="category-card">
-        <mat-card-title>Customer Retention Trend</mat-card-title>
-        <mat-card-subtitle>Monthly Distribution of New, Returning, and Dormant Customers</mat-card-subtitle>
-        <div class="chart-container">
-          <canvas baseChart
-            [data]="customerRetentionTrendData"
-            [options]="chartOptions"
-            [type]="'line'">
-          </canvas>
+    <!-- LOYALTY -->
+    <div *ngIf="selectedTab === 2" class="chart-card">
+      <div class="card-head">
+        <div>
+          <h3>Customer Retention</h3>
+          <p class="chart-subtitle">New vs Returning vs Inactive</p>
         </div>
-      </mat-card>
+      </div>
+      <div class="chart-wrap">
+        <canvas baseChart [data]="customerRetentionTrendData" [options]="chartOptions" [type]="'line'"></canvas>
+      </div>
     </div>
 
-    <!-- 🟠 Budtender Metrics Tab -->
-    <div *ngIf="selectedTab === 3">
-      <!-- Show employeeSalesChartData -->
+    <!-- BUDTENDER -->
+    <div *ngIf="selectedTab === 3" class="chart-card">
+      <div class="card-head">
+        <h3>Budtender Performance</h3>
+      </div>
+      <div class="chart-wrap">
+        <canvas baseChart [data]="employeeSalesChartData" [options]="chartOptions" [type]="'bar'"></canvas>
+      </div>
     </div>
 
-  
-
-</div>
-
-<div *ngIf="showModal" class="modal-overlay">
-  <div class="modal-inner">
-
-    <!-- Modal Header -->
-    <h2>Product Breakdown</h2>
-
-    <!-- Scrollable Table Wrapper -->
-    <div class="modal-table-wrapper">
-      <table mat-table [dataSource]="productSalesDataSource" matSort class="mat-elevation-z8">
-
-        <!-- Product Column -->
-        <ng-container matColumnDef="title">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Product</th>
-          <td mat-cell *matCellDef="let element">{{ element.title }}</td>
-        </ng-container>
-
-        <!-- Category Column -->
-        <ng-container matColumnDef="category">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Category</th>
-          <td mat-cell *matCellDef="let element">{{ element.category }}</td>
-        </ng-container>
-
-        <!-- Units Sold -->
-        <ng-container matColumnDef="unitsSold">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Units Sold</th>
-          <td mat-cell *matCellDef="let element">{{ element.unitsSold }}</td>
-        </ng-container>
-
-        <!-- Revenue -->
-        <ng-container matColumnDef="revenue">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Revenue</th>
-          <td mat-cell *matCellDef="let element">{{ element.revenue | currency }}</td>
-        </ng-container>
-
-        <!-- Avg Units Per Order -->
-        <ng-container matColumnDef="avgUnitsPerOrder">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Avg/Order</th>
-          <td mat-cell *matCellDef="let element">{{ element.avgUnitsPerOrder | number:'1.1-1' }}</td>
-        </ng-container>
-
-        <!-- Percent of Total Revenue -->
-        <ng-container matColumnDef="percentOfTotalRevenue">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>% Revenue</th>
-          <td mat-cell *matCellDef="let element">{{ element.percentOfTotalRevenue | number:'1.1-1' }}%</td>
-        </ng-container>
-
-        <!-- Table Rows -->
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-      </table>
-    </div>
-
-    <!-- Bottom Close Button -->
-    <button mat-button color="warn" (click)="showModal = false" class="modal-bottom-close">Close</button>
-
-  </div>
+  </section>
 </div>

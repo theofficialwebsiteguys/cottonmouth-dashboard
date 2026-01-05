@@ -1,88 +1,237 @@
-.orders-container {
-    margin: 20px;
+.page-shell {
+  padding: 24px;
+  background: #f4f6f8;
+  height: 100%;
+  font-family: Inter, system-ui, sans-serif;
 }
 
-.date-picker{
-    margin-left: 20px;
+/* ================= PAGE HEADER ================= */
+.orders-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+
+  h1 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #111827;
+  }
 }
 
-/* Make the table scrollable while keeping the headers fixed */
-.table-container {
-    max-height: 550px; /* Adjust height as needed */
-    overflow-y: auto; /* Enables vertical scrolling */
-    overflow-x: auto; /* Enables horizontal scrolling if needed */
-    display: block;
-    background: white; /* Ensures the background remains visible */
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3); /* Keeps shadow effect */
+/* ================= CONTROLS ================= */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-/* Keep table header visible while scrolling */
-th {
-    position: sticky;
-    top: 0;
-    background: white;
-    z-index: 2;
+/* ================= SEARCH ================= */
+.search-wrapper {
+  width: 360px; /* PRIMARY CONTROL */
+}
+
+.search-wrapper input {
+  width: 90%;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  background: #fff;
+
+  &:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  }
+}
+
+/* ================= DATE RANGE ================= */
+.date-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.date-range .range-input {
+  width: 260px;
+}
+
+/* normalize Material height */
+.date-range .mat-form-field-flex {
+  height: 40px;
+}
+
+.date-range .apply-range {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 8px;
+  background: #111827;
+  color: #fff;
+  border: none;
+}
+
+/* ================= EXPORT ================= */
+.export-btn {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  font-size: 14px;
+  cursor: pointer;
+
+  &:hover {
+    background: #f9fafb;
+  }
 }
 
 
-th {
-    position: sticky;
-    top: 0;
-    background: rgb(168, 168, 168) !important;
-    z-index: 2;
-}
+.header-actions {
+  display: flex;
+  gap: 10px;
 
+  input {
+    height: 32px;
+    padding: 0 10px;
+    border-radius: 6px;
+    border: 1px solid #d0d4db;
+    font-size: 13px;
+  }
 
-/* Alternate row colors */
-tr:nth-child(odd) {
-    background-color: #f9f9f9; /* Light grey */
-}
-
-tr:nth-child(even) {
-    background-color: #ffffff; /* White */
-}
-
-
-/* Ensure table header stands out */
-th {
-    background-color: #d1d1d1; /* Slightly darker grey for the header */
-    color: #333;
-    font-weight: bold;
-}
-
-/* Borders for better column separation */
-th, td {
-    border-bottom: 1px solid #ddd; /* Light border */
-    padding: 12px;
-}
-
-tr{
+  button {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #d0d4db;
+    background: #fff;
     cursor: pointer;
+    font-size: 13px;
+  }
 }
 
-/* Sales Metrics - Clean & Subtle */
-.sales-metrics {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: space-between;
-    padding: 10px 0;
+/* ================= SUMMARY ================= */
+.summary-row {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 16px;
+
+  div span {
+    display: block;
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  div strong {
     font-size: 14px;
-    color: #444;
-    border-bottom: 1px solid #ddd; /* Light divider for subtle separation */
-    margin-bottom: 15px;
+    font-weight: 600;
+  }
 }
 
-.sales-metrics span {
-    white-space: nowrap;
-    font-weight: 500;
+/* ================= TABLE CARD ================= */
+.orders-table-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow:
+    0 1px 2px rgba(16, 24, 40, 0.06),
+    0 8px 24px rgba(16, 24, 40, 0.08);
+  overflow: hidden; /* clean edges */
 }
 
-/* Responsive Tweaks */
-@media (max-width: 900px) {
-    .sales-metrics {
-        flex-direction: column;
-        gap: 10px;
-        align-items: flex-start;
-    }
+/* ================= TABLE HEADER ================= */
+.table-header,
+.table-row {
+  display: grid;
+  grid-template-columns:
+    90px
+    2.3fr
+    1.5fr
+    0.9fr
+    1fr
+    1fr
+    1.2fr;
+  align-items: center;
+  padding: 12px 20px;
+}
+
+.table-header {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  background: #fafafa;
+  border-bottom: 1px solid #e4e6eb;
+}
+
+/* ================= TABLE BODY ================= */
+.table-body {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.table-row {
+  font-size: 13px;
+  border-bottom: 1px solid #edf0f3;
+  cursor: pointer;
+
+  &:hover {
+    background: #f9fafb;
+  }
+}
+
+/* ================= CELLS ================= */
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.customer small,
+.items small {
+  display: block;
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.points {
+  color: #dc2626;
+  font-weight: 500;
+}
+
+.total {
+  font-weight: 600;
+}
+
+/* ================= STATUS ================= */
+.status {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  width: fit-content;
+  background: #fff3cd;
+  color: #92400e;
+}
+
+/* ================= DATE ================= */
+.date {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.date-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .range-input {
+    width: 260px;
+  }
+
+  .apply-range {
+    height: 40px;
+  }
+  
+}
+
+.date-range .apply-range {
+  background: #111827;
+  color: #fff;
+  border: none;
 }

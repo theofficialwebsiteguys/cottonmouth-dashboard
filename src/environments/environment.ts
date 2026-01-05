@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   apiUrl: 'http://localhost:3333/api',
-  db_api_key: 'c27c4d94eea807f6400604d204574663d179418bda4a8fa8a1a8bad48ea0fe3c'
+  db_api_key: '9ddf0fd5a3c5a99a8b357e6f6a0766ba82d45daac57dd55a2177fe35b690fa3b'
 };
 
 /*

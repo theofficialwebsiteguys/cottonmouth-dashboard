@@ -1,396 +1,172 @@
-<div class="admin-container">
+<div class="aiq-page tools-page">
 
-    <!-- Tab Navigation -->
-    <div class="tab-nav">
-      <button *ngFor="let tab of tabs; let i = index"
-              [class.active]="selectedTab === i"
-              (click)="selectedTab = i">
-        {{ tab }}
-      </button>
-    </div>
+  <!-- HEADER -->
+  <header class="aiq-header">
+    <h1>Tools</h1>
+    <p>Manage notifications, marketing, content, events, and delivery settings</p>
+  </header>
 
-     <!-- Sections Based on Selected Tab -->
-    <div *ngIf="selectedTab === 0">
-      <!-- Notification Center -->
-      <div class="section notification-section">
-        <h2>Notification Center</h2>
-        <div class="input-group">
-          <label>Notification Title</label>
-          <input type="text" [(ngModel)]="title" placeholder="Title" />
+  <!-- TOOL SWITCHER -->
+  <nav class="aiq-tabs">
+    <button
+      *ngFor="let tab of tabs; let i = index"
+      [class.active]="selectedTab === i"
+      (click)="selectedTab = i">
+      {{ tab }}
+    </button>
+  </nav>
+
+  <!-- WORKSPACE -->
+  <section class="aiq-workspace">
+
+    <!-- ========================= -->
+    <!-- TAB 0 — NOTIFICATIONS -->
+    <!-- ========================= -->
+    <div *ngIf="selectedTab === 0" class="aiq-grid">
+
+      <app-push-notification-tool></app-push-notification-tool>
+     
+
+
+      <!-- EMAIL BLAST -->
+      <div class="aiq-card">
+        <h2>Email Campaigns</h2>
+        <p class="muted">Create, schedule, and send email broadcasts.</p>
+
+        <!-- DOMAIN SETUP -->
+        <div *ngIf="!emailDomainVerified" class="notice">
+          <strong>Email domain required</strong>
+          <input placeholder="yourdomain.com" [(ngModel)]="emailDomain" />
+          <button class="primary" (click)="registerEmailDomain()">Verify Domain</button>
         </div>
 
-        <div class="input-group">
-          <label>Notification Body</label>
-          <textarea [(ngModel)]="body" placeholder="Body"></textarea>
-        </div>
+        <!-- EMAIL FORM -->
+        <div *ngIf="emailDomainVerified">
+          <input placeholder="Email subject" [(ngModel)]="emailSubject" />
+          <textarea placeholder="Email body" [(ngModel)]="emailBody"></textarea>
 
-        <div class="input-group">
-          <label>Select Category (Optional)</label>
-          <select [(ngModel)]="selectedCategory">
-            <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+          <select [(ngModel)]="targetAudience">
+            <option value="all">All Users</option>
+            <option value="loyalty">Loyalty Members</option>
+            <option value="employees">Employees</option>
           </select>
-        </div>
 
-        <div class="input-group">
-          <label>Upload Image</label>
-          <input type="file" (change)="onFileSelected($event)" accept="image/*" />
-        </div>
+          <input type="file" (change)="onFlyerSelected($event)" />
 
-        <div *ngIf="imageUrl" class="image-preview">
-          <img [src]="imageUrl" alt="Preview" />
-        </div>
-
-        <div class="button-group">
-          <button class="primary" (click)="sendNotification()">Send Notification</button>
-          <button class="secondary" (click)="clearNotificationForm()">Clear</button>
+          <div class="card-actions">
+            <button class="ghost" (click)="clearEmailForm()">Clear</button>
+            <button class="primary" (click)="createBroadcast()">Save Broadcast</button>
+          </div>
         </div>
       </div>
 
-      <div class="section email-section">
-        <h2>Email Blast Center</h2>
+      <!-- BROADCAST LIST -->
+      <div class="aiq-card full">
+        <h2>Scheduled & Draft Emails</h2>
 
-        <!-- Setup Phase -->
-        <div *ngIf="!emailDomainSubmitted || domainVerificationPending || !emailDomainVerified" class="email-setup-section">
-          <h3>Set Up Your Domain for Email</h3>
-          <div class="input-group" *ngIf="!emailDomainSubmitted">
-            <label>Enter Your Domain</label>
-            <input type="text" [(ngModel)]="emailDomain" placeholder="e.g. mydispensary.com" />
-            <div class="button-group">
-                <button class="primary" (click)="registerEmailDomain()">Register Domain</button>
-            </div>
+        <div *ngIf="isLoadingBroadcasts" class="loading">Loading…</div>
+
+        <div *ngFor="let b of userBroadcasts" class="list-row">
+          <div>
+            <strong>{{ b.data.subject }}</strong>
+            <small>{{ formatDate(b.data.created_at) }}</small>
           </div>
 
-          <div *ngIf="emailDomainSubmitted" class="domain-status-box">
-            <h3>Email Domain Setup</h3>
-            <p>
-              You’ve submitted <strong>{{ emailDomain }}</strong> for email marketing.
-            </p>
-
-            <div *ngIf="domainVerificationPending" class="status pending">
-              <span class="status-dot pending-dot"></span>
-              <strong>Domain verification is in progress.</strong>
-              <p>This may take a few minutes depending on your DNS provider.</p>
-            </div>
-
-            <div *ngIf="emailDomainVerified" class="status verified">
-              <span class="status-dot verified-dot"></span>
-              <strong>✅ Domain Verified — You're all set to start sending emails.</strong>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Final Email Sender Form -->
-        <div *ngIf="emailDomainVerified" class="email-blast-form">
-          <h3>Compose Email Blast</h3>
-
-          <div class="input-group">
-            <label>Email Subject</label>
-            <input type="text" [(ngModel)]="emailSubject" placeholder="Enter subject..." />
-          </div>
-
-          <div class="input-group">
-            <label>Email Body</label>
-            <textarea [(ngModel)]="emailBody" placeholder="Main content of the email"></textarea>
-          </div>
-
-          <div class="input-group">
-            <label>Attach Flyer (optional)</label>
-            <input type="file" (change)="onFlyerSelected($event)" accept="image/*,.pdf" id="flyerInput" />
-          </div>
-
-          <div *ngIf="flyerPreviewUrl" class="image-preview">
-            <img *ngIf="isImageFile" [src]="flyerPreviewUrl" alt="Flyer Preview" />
-            <p *ngIf="!isImageFile">📄 Flyer attached</p>
-          </div>
-
-          <div class="input-group">
-            <label>Target Audience</label>
-            <select [(ngModel)]="targetAudience">
-              <option value="all">All Users</option>
-              <option value="loyalty">Loyalty Members</option>
-              <option value="employees">Employees Only</option>
-            </select>
-          </div>
-
-          <div class="button-group">
-            <button class="secondary" (click)="createBroadcast()">Create & Save Broadcast</button>
-            <!-- <button class="primary" (click)="sendEmailBlast()">Send Email Blast</button> -->
-            <button class="secondary" (click)="clearEmailForm()">Clear</button>
-          </div>
-
-          <!-- Loading Spinner -->
-          <div *ngIf="isCreatingBroadcast" class="loading-message">Creating broadcast...</div>
-
-          <!-- Success Message -->
-          <div *ngIf="broadcastCreatedSuccessfully" class="success-message">
-            ✅ Broadcast created successfully!
-          </div>
-
-          <!-- Error Message -->
-          <div *ngIf="broadcastCreationError" class="error-message">
-            ⚠️ {{ broadcastCreationError }}
-          </div>
-
-        </div>
-        <div class="spinner-container" *ngIf="isLoadingBroadcasts">
-          <div class="spinner"></div>
-        </div>
-
-       <div class="section" *ngIf="!isLoadingBroadcasts && userBroadcasts.length > 0">
-        <h3>Scheduled or Unsent Broadcasts</h3>
-
-        <div *ngFor="let b of userBroadcasts" class="broadcast-card">
-          <div class="broadcast-header">
-            <div class="broadcast-info">
-              <h4>{{ b.data.name }}</h4>
-              <p class="subject">{{ b.data.subject }}</p>
-              <p class="timestamp">Created: {{ formatDate(b.data.created_at) }}</p>
-              <p *ngIf="b.data.scheduled_at" class="timestamp">Scheduled: {{ formatDate(b.data.scheduled_at) }}</p>
-            </div>
-
-            <div class="broadcast-actions">
-              <button class="primary" (click)="toggleScheduler(b.data.id)">
-                {{ activeScheduler === b.data.id ? 'Cancel' : 'Schedule & Send' }}
-              </button>
-              <button class="primary" [disabled]="sendingBroadcastId === b.data.id" (click)="scheduleBroadcast(b.data.id, true)">
-                {{ sendingBroadcastId === b.data.id ? 'Sending...' : 'Send Now' }}
-              </button>
-              <button class="danger" [disabled]="deletingBroadcastId === b.data.id" (click)="confirmDeleteBroadcast(b.data.id)">
-                {{ deletingBroadcastId === b.data.id ? 'Deleting...' : 'Delete' }}
-              </button>
-            </div>
-          </div>
-
-          <div *ngIf="activeScheduler === b.data.id" class="schedule-form">
-            <label>Pick Date & Time</label>
-            <input type="datetime-local" [(ngModel)]="scheduleDateTime" />
-            
-            <div class="action-buttons">
-              <button class="secondary" (click)="scheduleBroadcast(b.data.id)">Send</button>
-            </div>
+          <div class="row-actions">
+            <button (click)="toggleScheduler(b.data.id)">Schedule</button>
+            <button (click)="scheduleBroadcast(b.data.id, true)">Send</button>
+            <button class="danger" (click)="confirmDeleteBroadcast(b.data.id)">Delete</button>
           </div>
         </div>
-
-      </div>
-
-
       </div>
     </div>
 
+    <!-- ========================= -->
+    <!-- TAB 1 — BANNERS -->
+    <!-- ========================= -->
+    <div *ngIf="selectedTab === 1" class="aiq-grid">
 
-    <div *ngIf="selectedTab === 1">
-      <div class="section banner-section">
-        <h2>Banner Controller</h2>
-      
-        <!-- Image Grid -->
-        <div class="image-grid">
-          <div *ngFor="let image of carouselImages; let i = index" class="image-card" (click)="toggleDropdown(i)">
-            <img [src]="image" class="carousel-thumbnail">
-            <p>Carousel {{ i + 1 }}</p>
-          </div>
-        </div>
-      
-        <!-- Expandable Image Preview & Upload -->
-        <div *ngFor="let image of carouselImages; let i = index">
-          <div *ngIf="expandedIndex === i" class="expandable-content">
-      
-            <div class="image-comparison">
-              <!-- Original Image -->
-              <div class="image-preview-container">
-                <p>Original Image</p>
-                <img [src]="carouselImages[i]" class="preview-image original">
-              </div>
-      
-              <!-- Uploaded Image Preview (Appears Immediately) -->
-              <div class="image-preview-container" *ngIf="uploadedImagePreviewUrl[i]">
-                <p>Uploaded Image</p>
-                <img [src]="uploadedImagePreviewUrl[i]" class="preview-image uploaded">
-              </div>
+      <div class="aiq-card full">
+        <h2>Homepage Banners</h2>
+
+        <div class="banner-grid">
+          <div *ngFor="let image of carouselImages; let i = index" class="banner-card">
+            <img [src]="image" />
+            <div class="banner-actions">
+              <input type="file" (change)="onImageFileSelected($event, i)" />
+              <button (click)="replaceImage(i)">Replace</button>
+              <button class="danger" (click)="deleteImage(i)">Delete</button>
             </div>
-      
-            <!-- File Upload -->
-            <input type="file" (change)="onImageFileSelected($event, i)" accept="image/*">
-            <p *ngIf="selectedFileName">{{ selectedFileName }}</p>
-      
-            <!-- Replace Button -->
-            <button class="primary replace" (click)="replaceImage(i)" [disabled]="!selectedImageFile[i]">Replace Image</button>
-            <button class="danger delete" (click)="deleteImage(i)">Delete Image</button>
-
-
           </div>
         </div>
+
         <div class="add-banner">
-          <h3>Add New Banner</h3>
-          <input type="file" (change)="onAddBannerFileSelected($event)" accept="image/*">
-          <button class="primary upload" (click)="uploadNewBanner()" [disabled]="!addBannerFile">Upload Banner</button>
+          <input type="file" (change)="onAddBannerFileSelected($event)" />
+          <button class="primary" (click)="uploadNewBanner()">Add Banner</button>
         </div>
       </div>
     </div>
 
-    <div *ngIf="selectedTab === 2">
-      <div class="section event-section">
+    <!-- ========================= -->
+    <!-- TAB 2 — EVENTS -->
+    <!-- ========================= -->
+    <div *ngIf="selectedTab === 2" class="aiq-grid">
+
+      <div class="aiq-card">
         <h2>Create Event</h2>
-        
-        <div class="input-group">
-          <label>Event Title</label>
-          <input type="text" [(ngModel)]="eventTitle" placeholder="Enter event title" />
-        </div>
-        
-        <div class="input-group">
-          <label>Description</label>
-          <textarea [(ngModel)]="eventDescription" placeholder="Event details"></textarea>
-        </div>
-      
-        <div class="input-group">
-          <label>Location</label>
-          <input type="text" [(ngModel)]="eventLocation" placeholder="Event location" />
-        </div>
-        
-        <!-- This uses a datetime-local input so user can pick date & time -->
-        <div class="input-group">
-          <label>Date & Time</label>
-          <input type="datetime-local" [(ngModel)]="eventDateTime" />
-        </div>
-        
-        <div class="input-group">
-          <label>Event Image File</label>
-          <input type="file" (change)="onEventFileSelected($event)" accept="image/*" />
-        </div>
-      
-        <div class="button-group">
-          <button class="primary" (click)="createEvent()">Create Event</button>
-          <button class="secondary" (click)="clearEventForm()">Clear Fields</button>
-        </div>
-      </div>
-      
+        <input placeholder="Event title" [(ngModel)]="eventTitle" />
+        <textarea placeholder="Description" [(ngModel)]="eventDescription"></textarea>
+        <input placeholder="Location" [(ngModel)]="eventLocation" />
+        <input type="datetime-local" [(ngModel)]="eventDateTime" />
+        <input type="file" (change)="onEventFileSelected($event)" />
 
-      <div class="section">
-        <h2>Manage Events</h2>
-      
-        <div *ngFor="let event of events" class="event-card">
-          
-          <!-- VIEW MODE -->
-          <div *ngIf="editingEventId !== event.id">
-            <h4>{{ event.title }}</h4>
-            <p>{{ event.description }}</p>
-            <p><strong>Date:</strong> {{ event.dateTime | date:'medium' }}</p>
-            <p *ngIf="event.image">
-              <img [src]="event.image" alt="Event" style="max-width: 200px;" />
-            </p>
-            <div class="button-group">
-              <button class="primary" (click)="startEditEvent(event)">Edit</button>
-              <button class="secondary" (click)="deleteEvent(event.id)">Delete</button>
-            </div>
+        <div class="card-actions">
+          <button class="ghost" (click)="clearEventForm()">Clear</button>
+          <button class="primary" (click)="createEvent()">Create</button>
+        </div>
+      </div>
+
+      <div class="aiq-card full">
+        <h2>Events</h2>
+
+        <div *ngFor="let event of events" class="list-row">
+          <div>
+            <strong>{{ event.title }}</strong>
+            <small>{{ event.dateTime | date:'medium' }}</small>
           </div>
-      
-          <!-- EDIT MODE -->
-          <div *ngIf="editingEventId === event.id">
-            <div class="input-group">
-              <label>Title</label>
-              <input [(ngModel)]="editEventForm.title" />
-            </div>
-      
-            <div class="input-group">
-              <label>Description</label>
-              <textarea [(ngModel)]="editEventForm.description"></textarea>
-            </div>
-      
-            <div class="input-group">
-              <label>Location</label>
-              <input [(ngModel)]="editEventForm.location" />
-            </div>
-      
-            <div class="input-group">
-              <label>Date & Time</label>
-              <input type="datetime-local" [(ngModel)]="editEventForm.dateTime" />
-            </div>
-      
-            <div class="input-group">
-              <label>Replace Image (optional)</label>
-              <input type="file" (change)="onEditEventFileSelected($event)" />
-            </div>
-      
-            <div class="button-group">
-              <button class="primary" (click)="saveEventChanges()">Save</button>
-              <button class="secondary" (click)="cancelEventEdit()">Cancel</button>
-            </div>
+
+          <div class="row-actions">
+            <button (click)="startEditEvent(event)">Edit</button>
+            <button class="danger" (click)="deleteEvent(event.id)">Delete</button>
           </div>
         </div>
       </div>
-      
     </div>
 
-    <div *ngIf="selectedTab === 3">
-      <div class="section delivery-section">
-        <h2>Delivery</h2>
-        <label class="toggle-switch">
+    <!-- ========================= -->
+    <!-- TAB 3 — DELIVERY -->
+    <!-- ========================= -->
+    <div *ngIf="selectedTab === 3" class="aiq-grid">
+
+      <div class="aiq-card">
+        <h2>Delivery Availability</h2>
+        <label class="toggle">
           <input type="checkbox" [checked]="deliveryAvailable" (change)="onToggleDelivery()" />
-          <span class="slider"></span>
+          <span></span>
         </label>
       </div>
 
-      <div class="section delivery-zone-section">
-        <h2>Delivery Zone Builder</h2>
-      
-        <div #mapContainer class="map-container" id="map"></div>
-      
-        <div *ngIf="drawnZone" class="zone-form">
-          <h4>Zone Schedule</h4>
-          <div class="day-row" *ngFor="let day of days">
-            <label class="day-label">
-              <input type="checkbox" [(ngModel)]="zoneSchedule[day].enabled" />
-              {{ day }}
-            </label>
-        
-            <div *ngIf="zoneSchedule[day].enabled" class="time-inputs">
-              <input type="time" [(ngModel)]="zoneSchedule[day].start" />
-              <span>to</span>
-              <input type="time" [(ngModel)]="zoneSchedule[day].end" />
-            </div>
-          </div>
-        
-          <button class="primary save-zone-btn" [disabled]="isSavingZone" (click)="saveZone()">
-            <span *ngIf="!isSavingZone">Save Zone</span>
-            <span *ngIf="isSavingZone">Saving...</span>
+      <div class="aiq-card full">
+        <h2>Delivery Zones</h2>
+        <div #mapContainer class="map"></div>
+
+        <div class="card-actions">
+          <button class="primary" (click)="saveZone()" [disabled]="isSavingZone">
+            {{ isSavingZone ? 'Saving…' : 'Save Zone' }}
           </button>
-          
-          <div *ngIf="zoneSavedSuccessfully" class="success-message">
-            Zone saved successfully!
-          </div>
-          
         </div>
-        
       </div>
     </div>
 
-    <div class="grid-container">
-      
-      <!-- LEFT COLUMN: DELIVERY + NOTIFICATION -->
-      <div class="left-column">
-        
-        <!-- Delivery Toggle (Compact & On Top) -->
-
-  
-
-  
-      </div>
-
-      <div class="right-column">
-     
-        
-
-            
-
-
-  
-         
-          
-        </div>
-
-
-      
-    </div>
-  </div>
-  
-  
+  </section>
+</div>

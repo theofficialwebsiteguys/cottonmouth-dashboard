@@ -1,15 +1,39 @@
-<header class="header">
-    <div class="date">
-        <i class="fa-solid fa-calendar"></i>
-        <p>{{ today }}</p>
+<header class="dashboard-header">
+
+  <!-- Left: Date -->
+  <div class="header-date">
+    <i class="fa-solid fa-calendar"></i>
+    <span>{{ today }}</span>
+  </div>
+
+  <!-- Center: KPIs -->
+  <div class="header-kpis">
+    <div class="kpi">
+      <i class="fa-solid fa-dollar-sign"></i>
+      <span class="label">Sales</span>
+      <strong>{{ totalSalesToday | currency }}</strong>
     </div>
 
-    <div class="metrics">
-        <p><i class="fa-solid fa-dollar-sign"></i> <strong>Total Sales:</strong> ${{ totalSalesToday.toFixed(2) }}</p>
-        <p><i class="fa-solid fa-box"></i> <strong>Top Product:</strong> {{ topProductToday || 'N/A' }}</p>
-        <p><i class="fa-solid fa-receipt"></i> <strong>Total Orders:</strong> {{ totalOrdersToday }}</p>
-    </div>
-    
+    <div class="divider"></div>
 
-    <a class="view-store" [routerLink]="'/'">View Store</a>
+    <div class="kpi">
+      <i class="fa-solid fa-receipt"></i>
+      <span class="label">Orders</span>
+      <strong>{{ totalOrdersToday }}</strong>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="kpi">
+      <i class="fa-solid fa-box"></i>
+      <span class="label">Top Product</span>
+      <strong>{{ topProductToday || '—' }}</strong>
+    </div>
+  </div>
+
+  <!-- Right: Action -->
+  <a class="view-store-btn" [routerLink]="'/'">
+    View Store
+  </a>
+
 </header>

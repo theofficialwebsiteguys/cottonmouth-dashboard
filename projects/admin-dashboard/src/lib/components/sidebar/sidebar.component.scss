@@ -1,47 +1,152 @@
 .sidenav-container {
-    height: 100%;
-  }
-  
-  .sidenav {
-    width: 250px;
-    background-color: #212121;
-    color: white;
-    padding: 20px;
-    border-radius: 0;
-  }
-  
-  .logo-container {
-    width: 100%;
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  img {
-    width: 100%;
-    height: auto;
-  }
-  
-  .fa-solid {
-    margin: 5px;
-    color: white;
-  }
-  
-  .list-item {
-    color: white;
-  }
-  
-  .topbar {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    background-color: #212121;
-  }
-  
-  .hamburger {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 24px;
-    cursor: pointer;
-  }
-  
+  height: 100%;
+}
+
+.sidenav {
+  width: 260px;
+  padding: 18px 14px;
+  color: #eaeaea;
+
+  /* Modern dark surface */
+  background: linear-gradient(180deg, #0f1115 0%, #0b0d10 100%);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+
+  /* Keep it clean */
+  border-radius: 0;
+}
+
+/* Brand */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 10px 16px 10px;
+}
+
+.brand-logo {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 8px;
+}
+
+.brand-meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.brand-title {
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.2px;
+}
+
+.brand-subtitle {
+  margin-top: 4px;
+  font-size: 12px;
+  color: rgba(234, 234, 234, 0.65);
+}
+
+/* Nav */
+.nav {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nav-section-label {
+  padding: 10px 10px 6px 10px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(234, 234, 234, 0.45);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px 10px;
+  border-radius: 12px;
+
+  color: rgba(234, 234, 234, 0.82);
+  text-decoration: none;
+
+  transition: background 120ms ease, color 120ms ease, transform 120ms ease;
+}
+
+.nav-icon {
+  width: 18px;
+  text-align: center;
+  font-size: 15px;
+  color: rgba(234, 234, 234, 0.75);
+}
+
+.nav-text {
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+/* Hover */
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+/* Active (this is the “AIQ/Dutchie” feel) */
+.nav-item.active {
+  background: rgba(110, 146, 119, 0.18); /* matches your CannaOS green vibe */
+  border: 1px solid rgba(110, 146, 119, 0.28);
+  color: #ffffff;
+}
+
+.nav-item.active .nav-icon {
+  color: #ffffff;
+}
+
+/* Divider */
+.nav-divider {
+  height: 1px;
+  margin: 10px 10px 6px 10px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Footer */
+.nav-footer {
+  margin-top: auto;
+  padding: 14px 10px 6px 10px;
+}
+
+.footer-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #3ddc84;
+}
+
+.footer-text {
+  font-size: 12px;
+  color: rgba(234, 234, 234, 0.75);
+}
+
+/* Optional: content spacing */
+.content {
+  padding: 18px;
+  background: #0b0d10;
+  min-height: 100%;
+}

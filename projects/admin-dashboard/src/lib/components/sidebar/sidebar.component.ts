@@ -25,13 +25,23 @@ export class SidebarComponent {
     this.checkScreenSize();
   }
 
-  checkScreenSize() {
-    this.isMobile = window.innerWidth < 768;
-  }
 
   @Output() linkClicked = new EventEmitter<void>();
 
   linkClick() {
+    this.linkClicked.emit();
+  }
+
+  
+  @HostListener('window:resize')
+  checkScreenSize() {
+    this.isMobile = window.innerWidth < 900;
+  }
+
+  handleNavClick() {
+    if (this.isMobile) {
+      this.sidenav.close();
+    }
     this.linkClicked.emit();
   }
 }

@@ -1,81 +1,119 @@
-<div class="orders-container" *ngIf="!selectedOrder; else orderDetails">
-  <h2>Orders</h2>
-  <button class="export-button" mat-raised-button color="primary" (click)="exportToCSV()">
-    Export to CSV
-  </button>
+<div *ngIf="!selectedOrder; else details" class="page-shell">
 
-  <!-- Sales Metrics -->
-  <div class="sales-metrics">
-    <span><strong>Top Sold Product:</strong> {{ topProduct || 'N/A' }}</span>
-    <span><strong>Top Category:</strong> {{ topCategory || 'N/A' }}</span>
-    <span><strong>Top Brand:</strong> {{ topBrand || 'N/A' }}</span>
-    <span><strong>Total Orders:</strong> {{ totalOrders }}</span>
-    <span><strong>Total Sales:</strong> {{ totalAmount | currency }}</span>
-    <span><strong>Avg Order Amount:</strong> {{ avgOrderAmount | currency }}</span>
-    <span><strong>Daily Avg Sales:</strong> {{ avgDailySales | currency }}</span>
-    <span><strong>Weekly Avg Sales:</strong> {{ avgWeeklySales | currency }}</span>
-    <span><strong>Monthly Avg Sales:</strong> {{ avgMonthlySales | currency }}</span>
+  <!-- PAGE HEADER -->
+  <div class="orders-header">
+    <h1>Orders</h1>
+
+    <div class="header-controls">
+      <!-- SEARCH (PRIMARY) -->
+      <div class="search-wrapper">
+        <input
+          type="text"
+          placeholder="Search by name, order ID, or POS ID"
+          [(ngModel)]="searchTerm"
+        />
+      </div>
+
+      <!-- DATE RANGE -->
+      <div class="date-range">
+        <mat-form-field appearance="outline" class="range-input">
+          <mat-label>Date range</mat-label>
+
+          <mat-date-range-input [rangePicker]="rangePicker">
+            <input matStartDate placeholder="Start" [(ngModel)]="customStartDate" />
+            <input matEndDate placeholder="End" [(ngModel)]="customEndDate" />
+          </mat-date-range-input>
+
+          <mat-datepicker-toggle matSuffix [for]="rangePicker"></mat-datepicker-toggle>
+          <mat-date-range-picker #rangePicker></mat-date-range-picker>
+        </mat-form-field>
+
+        <button
+          mat-flat-button
+          class="apply-range"
+          [disabled]="!customStartDate || !customEndDate"
+          (click)="applyCustomRange()">
+          Apply
+        </button>
+      </div>
+
+      <!-- EXPORT -->
+      <button class="export-btn" (click)="exportToCSV()">
+        Export
+      </button>
+    </div>
   </div>
 
-  <!-- Search Bar -->
-  <mat-form-field class="search-bar">
-    <mat-label>Search Orders</mat-label>
-    <input matInput (keyup)="applyFilter($event)" placeholder="Search any column">
-  </mat-form-field>
 
-  <mat-form-field class="date-picker">
-    <mat-label>Filter by Date</mat-label>
-    <input matInput [matDatepicker]="picker" (dateChange)="filterByDate($event.value)">
-    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-    <mat-datepicker #picker></mat-datepicker>
-  </mat-form-field>
-  
+  <!-- SUMMARY (NOT PART OF TABLE) -->
+  <div class="summary-row">
+    <div>
+      <span>Pending Total</span>
+      <strong>{{ pendingTotal | currency }}</strong>
+    </div>
+    <div>
+      <span>Total Orders</span>
+      <strong>{{ totalOrders }}</strong>
+    </div>
+    <div>
+      <span>Avg Order</span>
+      <strong>{{ avgOrderAmount | currency }}</strong>
+    </div>
+  </div>
 
-  <!-- Scrollable Table -->
-  <div class="table-container">
-    <table mat-table [dataSource]="filteredOrders" matSort class="mat-elevation-z8">
-      
-      <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>#</th>
-        <td mat-cell *matCellDef="let order" (click)="selectOrder(order)" class="clickable">{{ order.id }}</td>
-      </ng-container>
+  <!-- ================= TABLE CARD ================= -->
+  <div class="orders-table-card">
 
-      <ng-container matColumnDef="pos_order_id">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>POS Order ID</th>
-        <td mat-cell *matCellDef="let order">{{ order.pos_order_id }}</td>
-      </ng-container>
+    <!-- TABLE HEADER -->
+    <div class="table-header">
+      <span>ID</span>
+      <span>Customer</span>
+      <span>Items</span>
+      <span>Points</span>
+      <span>Total</span>
+      <span>Status</span>
+      <span>Date</span>
+    </div>
 
-      <ng-container matColumnDef="user_id">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>User ID</th>
-        <td mat-cell *matCellDef="let order">{{ order.user_id }}</td>
-      </ng-container>
+    <!-- TABLE BODY -->
+    <div class="table-body">
+      <div
+        class="table-row"
+        *ngFor="let order of filteredOrders"
+        (click)="selectOrder(order)"
+      >
+        <span class="mono">#{{ order.id }}</span>
 
-      <ng-container matColumnDef="points_add">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Points Added</th>
-        <td mat-cell *matCellDef="let order">{{ order.points_add }}</td>
-      </ng-container>
+        <span class="customer">
+          {{ order.Customer?.fname }} {{ order.Customer?.lname }}
+          <small>{{ order.Customer?.email }}</small>
+        </span>
 
-      <ng-container matColumnDef="points_redeem">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Points Redeemed</th>
-        <td mat-cell *matCellDef="let order">{{ order.points_redeem }}</td>
-      </ng-container>
+        <span class="items">
+          {{ order.items.length }}
+          <small>{{ order.items[0]?.title }}</small>
+        </span>
 
-      <ng-container matColumnDef="total_amount">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Total Amount</th>
-        <td mat-cell *matCellDef="let order">{{ order.total_amount | currency }}</td>
-      </ng-container>
+        <span class="points">-{{ order.points_redeem }}</span>
 
-      <ng-container matColumnDef="createdAt">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Created At</th>
-        <td mat-cell *matCellDef="let order">{{ order.createdAt | date:'medium' }}</td>
-      </ng-container>
+        <span class="total">{{ order.total_amount | currency }}</span>
 
-      <tr mat-header-row *matHeaderRowDef="orderColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: orderColumns;" (click)="selectOrder(row)" class="clickable"></tr>
-    </table>
+        <span class="status" [class.pending]="!order.status">
+          {{ order.status || 'Pending' }}
+        </span>
+
+        <span class="date">
+          {{ order.createdAt | date:'short' }}
+        </span>
+      </div>
+    </div>
+
   </div>
 </div>
 
-<ng-template #orderDetails>
-  <lib-order-details [order]="selectedOrder" (back)="clearSelection()"></lib-order-details>
+<ng-template #details>
+  <lib-order-details
+    [order]="selectedOrder"
+    (back)="clearSelection()"
+  ></lib-order-details>
 </ng-template>

@@ -1,378 +1,52 @@
-/* 🔹 Ensure dashboard is fully responsive */
-.dashboard-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    padding: 20px;
-    height: 100vh;
-    box-sizing: border-box;
-    max-height: 850px;
-    overflow-y: auto;
-    overflow-x: hidden; /* Prevents horizontal scrolling */
-    position: relative;
+.overview-page {
+  padding: 24px;
+  background: #f7f8fa;
+  min-height: 100%;
 }
 
-/* 🔹 Responsive Metrics Section */
-.metrics-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    justify-content: space-between;
-}
-
-.metric-card {
-    flex: 1;
-    min-width: 160px;
-    text-align: center;
-    padding: 12px;
-    font-size: 14px;
-    background: #ffffff;
-    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-}
-
-.metric-value {
-    font-size: 20px;
-    font-weight: bold;
-    margin: 10px;
-}
-
-/* 🔹 Main Grid: Left (Sales Charts) - Right (Category + Customer Retention) */
-.main-grid {
-    display: grid;
-    grid-template-columns: 3fr 2fr;
-    gap: 20px;
-    align-items: stretch;
-    height: calc(100vh - 200px);
-}
-
-/* 🔹 Left Column: Sales Charts */
-.left-column {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    overflow: hidden;
-    min-width: 0; /* Prevents flex items from breaking responsiveness */
-}
-
-.chart-card {
-    height: 45%;
-    padding: 20px;
-    background: #ffffff;
-    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-}
-
-/* 🔹 Right Column: Category Sales + Customer Retention */
-.right-column {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    min-width: 0;
-}
-
-/* 🔹 Category & Customer Retention Cards */
-.category-card {
-    flex: 1;
-    padding: 20px;
-    background: #ffffff;
-    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.08);
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    min-width: 0;
-}
-
-/* 🔹 Make Charts Responsive */
-.chart-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: auto; /* Allow charts to adapt */
-}
-
-.chart-container canvas {
-    max-width: 100%;
-    max-height: 250px;
-}
-
-/* 🔹 Keep Lists and Pie Charts Readable */
-.top-list {
-    list-style: none;
-    padding: 10px;
-    font-size: 14px;
-    color: #333;
-    margin-top: 10px;
-    border-top: 1px solid #ddd;
-    text-align: left;
-    width: 100%;
-}
-
-.top-list li {
-    padding: 4px 0;
-    font-weight: 500;
-}
-
-/* 🔹 Responsive Breakpoints */
-@media (max-width: 1024px) {
-    .main-grid {
-        grid-template-columns: 1fr;
-        height: auto;
-    }
-
-    .right-column {
-        flex-direction: row;
-        gap: 10px;
-        align-items: center;
-    }
-
-    .category-card {
-        flex: 1;
-        min-width: 45%; /* Keeps two cards side by side */
-    }
-
-    .chart-container {
-        height: 200px;
-    }
-}
-
-@media (max-width: 768px) {
-    .metrics-container {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .metric-card {
-        width: 100%;
-    }
-
-    .right-column {
-        flex-direction: column;
-    }
-
-    .category-card {
-        width: 100%;
-    }
-
-    .chart-container {
-        height: 180px;
-    }
-}
-
-
-/* 🔹 Fix Category Cards on Mobile */
-@media (max-width: 480px) {
-    .category-card {
-        width: 100%;
-        padding: 15px;
-    }
-
-    .chart-container canvas {
-        max-width: 90%;
-    }
-
-    .top-list {
-        font-size: 12px;
-    }
-}
-
-.modal-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 9999; /* 🔥 make it higher than your sidebar */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    box-sizing: border-box;
-  }
-  
-  
-  .modal-inner {
-    position: relative;
-    background: #fff;
-    border-radius: 12px;
-    padding: 20px 24px;
-    width: 100%;
-    max-width: 1000px;
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden; /* Important */
-  }
-  
-  .modal-table-wrapper {
-    overflow-y: auto;
-    max-height: 60vh; /* 👈 Adjust this based on how tall you want the scrollable section */
-    border: 1px solid #ddd;
-    border-radius: 6px;
-  }
-  
-  /* Optional — sticky header enhancement */
-  mat-header-cell {
-    background-color: #f7f7f7;
-    font-weight: bold;
-    position: sticky;
-    top: 0;
-    z-index: 2;
-  }
-  
-  
-  .modal-inner h2 {
-    margin: 0 0 16px;
-    font-size: 20px;
-  }
-  
-  .mat-elevation-z8 {
-    box-shadow: none;
-  }
-  
-  .table-wrapper {
-    overflow-y: auto;
-    flex-grow: 1;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-  }
-  
-  mat-table {
-    width: 100%;
-    min-width: 700px;
-  }
-  
-  mat-header-row, mat-row {
-    display: flex;
-    align-items: center;
-  }
-  
-  mat-header-cell, mat-cell {
-    flex: 1;
-    padding: 12px;
-    font-size: 14px;
-    white-space: nowrap;
-  }
-  
-
-  mat-cell {
-    border-bottom: 1px solid #eee;
-  }
-  
-  button.mat-button {
-    align-self: flex-end;
-    margin-top: 20px;
-  }
-  
-  .modal-close-btn {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background: transparent;
-    border: none;
-    font-size: 24px;
-    font-weight: bold;
-    cursor: pointer;
-    color: #333;
-    z-index: 10;
-    transition: color 0.2s ease;
-  }
-  
-  .modal-close-btn:hover {
-    color: #f44336; /* Material red */
-  }
-  
-  .modal-bottom-close{
-    margin: 20px;
-  }
-
-  .tab-navigation {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-  
-    button {
-      padding: 10px 16px;
-      border: none;
-      background: #e0e0e0;
-      cursor: pointer;
-      font-weight: bold;
-      border-radius: 6px;
-  
-      &.active {
-        background: #1976d2;
-        color: white;
-      }
-  
-      &:hover {
-        background: #c7c7c7;
-      }
-    }
-  }
-  
-  .chart-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
-    gap: 24px;
-    margin-top: 12px;
-  }
-  
-  .chart-card {
-    padding: 24px;
-    border-radius: 12px;
-    background: #ffffff;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-  
-  .chart-card canvas {
-    flex-grow: 1;
-    width: 100% !important;
-    height: auto !important;
-  }
-  
-  .chart-title {
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 12px;
-  }
-  
-  .metrics-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    margin-bottom: 12px;
-  }
-  
-  .metrics-range-selector {
-    min-width: 200px;
-  }
-  
-.metrics-header-row {
+/* Header */
+.overview-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: nowrap;
-  margin-bottom: 1rem;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
-.range-dropdown {
+.overview-header h1 {
+  font-size: 22px;
+  font-weight: 750;
+  margin: 0;
+  color: #111827;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 4px 0 0;
+}
+
+.header-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.control {
   min-width: 180px;
 }
 
-.custom-range-fields {
+/* Custom range row */
+.custom-range {
   display: flex;
+  gap: 12px;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  margin: 10px 0 18px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
 }
 
 .date-field {
@@ -380,6 +54,231 @@
 }
 
 .apply-btn {
-  height: 40px;
-  padding: 0 24px;
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 12px;
+}
+
+/* KPIs */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.kpi-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 18px;
+  border: 1px solid #e5e7eb;
+}
+
+.kpi-card span {
+  display: block;
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.kpi-card strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 24px;
+  font-weight: 760;
+  color: #111827;
+}
+
+.kpi-card.primary {
+  background: linear-gradient(180deg, rgba(110, 146, 119, 0.18), #ffffff);
+  border-color: rgba(110, 146, 119, 0.35);
+}
+
+/* Segmented tabs */
+.segmented-tabs {
+  display: inline-flex;
+  padding: 4px;
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 18px;
+}
+
+.segmented-tabs button {
+  padding: 9px 14px;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.segmented-tabs button.active {
+  background: rgba(110, 146, 119, 0.2);
+  color: #111827;
+}
+
+/* Main content surface */
+.content-surface {
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid #e5e7eb;
+  padding: 20px;
+}
+
+/* Cards */
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 18px;
+}
+
+.split-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 18px;
+}
+
+.chart-card,
+.list-card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #eef0f3;
+  padding: 18px;
+}
+
+.card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.chart-card h3,
+.list-card h3 {
+  font-size: 15px;
+  font-weight: 760;
+  margin: 0;
+  color: #111827;
+}
+
+.chart-subtitle {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 4px 0 0;
+}
+
+.hint {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+/* Chart sizing (keeps cards from collapsing) */
+.chart-wrap {
+  height: 320px;
+}
+
+.chart-wrap.small {
+  height: 280px;
+}
+
+.chart-wrap canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Top list */
+.top-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.top-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.top-list li:last-child {
+  border-bottom: none;
+}
+
+.name {
+  color: #111827;
+  font-size: 13px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.val {
+  color: #111827;
+  font-weight: 750;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .split-grid {
+    grid-template-columns: 1fr;
+  }
+  .chart-wrap {
+    height: 280px;
+  }
+}
+
+/* Range group */
+.range-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Select */
+.range-select {
+  min-width: 170px;
+}
+
+/* Inline dates */
+.inline-dates {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 4px;
+}
+
+/* Date fields */
+.date-field {
+  width: 150px;
+}
+
+/* Separator */
+.date-separator {
+  color: #9ca3af;
+  font-weight: 600;
+  margin: 0 2px;
+}
+
+/* Apply button */
+.apply-inline {
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .range-group {
+    flex-wrap: wrap;
+  }
 }

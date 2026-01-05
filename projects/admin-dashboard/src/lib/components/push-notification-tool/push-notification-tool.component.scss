@@ -61,9 +61,11 @@ select {
 }
 
 .card-actions {
+  margin-top: 10px;
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+  
 }
 
 .primary {
@@ -72,6 +74,7 @@ select {
   padding: 10px 16px;
   border-radius: 8px;
   border: none;
+  cursor: pointer;
 }
 
 .ghost {
@@ -79,6 +82,7 @@ select {
   border: 1px solid #ccc;
   padding: 10px 16px;
   border-radius: 8px;
+  cursor: pointer;
 }
 
 .danger {

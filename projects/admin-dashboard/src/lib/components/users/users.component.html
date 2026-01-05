@@ -1,95 +1,80 @@
-<div class="users-container">
-    <h2>Users ({{ filteredUsers.data.length }})</h2>
+<div class="page-shell users-shell">
 
-    <lib-order-details *ngIf="selectedUser && selectedOrder" [order]="selectedOrder" (back)="closeDetail()"></lib-order-details>
-    <lib-user-detail *ngIf="selectedUser && !selectedOrder" [user]="selectedUser" (closeDetail)="closeDetail()" (orderSelected)="selectOrder($event)"></lib-user-detail>
-    <div *ngIf="!selectedUser">
-<!-- Search Bar -->
-<mat-form-field class="search-bar">
-    <mat-label>Search Users</mat-label>
-    <input matInput (keyup)="applyFilter($event)" placeholder="Search by Name or Email">
-</mat-form-field>
+  <!-- HEADER -->
+  <div class="users-header">
+    <h1>Users</h1>
 
-<button class="export-button" mat-raised-button color="primary" (click)="exportToCSV()">
-    Export to CSV
-  </button>
-  
+    <div class="header-controls">
+      <div class="search-wrapper">
+       <input
+            type="text"
+            placeholder="Search by name or email"
+            [(ngModel)]="searchTerm"
+            />
+      </div>
 
-<!-- Scrollable Table Wrapper -->
-<div class="table-container">
-    <table mat-table [dataSource]="filteredUsers" matSort class="mat-elevation-z8">
-        <ng-container matColumnDef="id">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
-            <td mat-cell *matCellDef="let user">{{ user.id }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
-            <td mat-cell *matCellDef="let user">{{ user.fname }} {{ user.lname }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="email">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Email</th>
-            <td mat-cell *matCellDef="let user">{{ user.email }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="dob">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>DOB (Age)</th>
-            <td mat-cell *matCellDef="let user">
-                {{ user.dob | date:'MM/dd/yyyy' }} ({{ calculateAge(user.dob) }} years)
-            </td>
-        </ng-container>
-          
-<!-- 
-        <ng-container matColumnDef="country">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>country</th>
-            <td mat-cell *matCellDef="let user">{{ user.country }}</td>
-        </ng-container> -->
-
-        <ng-container matColumnDef="phone">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>phone</th>
-            <td mat-cell *matCellDef="let user">{{ user.phone }}</td>
-        </ng-container>
-
-        <!-- <ng-container matColumnDef="alleaves_customer_id">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>alleaves_customer_id</th>
-            <td mat-cell *matCellDef="let user">{{ user.alleaves_customer_id }}</td>
-        </ng-container> -->
-        
-        <ng-container matColumnDef="points">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>points</th>
-            <td mat-cell *matCellDef="let user">{{ user.points }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="mostOrderedProduct">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Most Ordered Product</th>
-            <td mat-cell *matCellDef="let user">{{ user.mostOrderedProduct }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="mostOrderedCategory">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Most Ordered Category</th>
-            <td mat-cell *matCellDef="let user">{{ user.mostOrderedCategory }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="averageSpend">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Average Spend</th>
-            <td mat-cell *matCellDef="let user">${{ user.averageSpend }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="totalSpent">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Total Spent</th>
-            <td mat-cell *matCellDef="let user">${{ user.totalSpent }}</td>
-        </ng-container>
-
-        <ng-container matColumnDef="createdAt">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>createdAt</th>
-            <td mat-cell *matCellDef="let user">{{ user.createdAt }}</td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="userColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: userColumns;"  (click)="selectUser(row)"></tr>
-    </table>
-</div>
+      <button class="export-btn" (click)="exportToCSV()">
+        Export
+      </button>
     </div>
-    
+  </div>
+
+  <!-- TABLE CARD -->
+  <div class="users-table-card" *ngIf="!selectedUser">
+
+    <!-- TABLE HEADER -->
+    <div class="table-header">
+      <span>ID</span>
+      <span>User</span>
+      <span>Phone</span>
+      <span>Points</span>
+      <span>Avg Spend</span>
+      <span>Total Spent</span>
+      <span>Joined</span>
+    </div>
+
+    <!-- TABLE BODY -->
+    <div class="table-body">
+      <div
+        class="table-row"
+        *ngFor="let user of displayedUsers"
+        (click)="selectUser(user)"
+      >
+        <span class="mono">#{{ user.id }}</span>
+
+        <span class="user">
+          {{ user.fname }} {{ user.lname }}
+          <small>{{ user.email }}</small>
+        </span>
+
+        <span>{{ user.phone || '—' }}</span>
+
+        <span class="points">{{ user.points }}</span>
+
+        <span class="total">${{ user.averageSpend }}</span>
+
+        <span class="total">${{ user.totalSpent }}</span>
+
+        <span class="date">
+          {{ user.createdAt | date:'shortDate' }}
+        </span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- DETAILS -->
+  <lib-user-detail
+    *ngIf="selectedUser && !selectedOrder"
+    [user]="selectedUser"
+    (closeDetail)="closeDetail()"
+    (orderSelected)="selectOrder($event)">
+  </lib-user-detail>
+
+  <lib-order-details
+    *ngIf="selectedUser && selectedOrder"
+    [order]="selectedOrder"
+    (back)="closeDetail()">
+  </lib-order-details>
+
 </div>

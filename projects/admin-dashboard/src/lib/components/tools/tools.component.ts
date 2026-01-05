@@ -2,10 +2,11 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { AdminService } from '../../services/admin.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { PushNotificationToolComponent } from '../push-notification-tool/push-notification-tool.component';
 
 @Component({
   selector: 'lib-tools',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PushNotificationToolComponent],
   templateUrl: './tools.component.html',
   styleUrl: './tools.component.css'
 })
@@ -20,10 +21,10 @@ export class ToolsComponent {
   days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   zoneSchedule: Record<string, { enabled: boolean; start: string; end: string }> = {};
   
-  title: string = '';
-  body: string = '';
-  imageUrl: string = '';
-  selectedFileName: string | null = null;
+  // title: string = '';
+  // body: string = '';
+  // imageUrl: string = '';
+  // selectedFileName: string | null = null;
   selectedCategory: string = '';
   categories: string[] = ['PREROLL', 'EDIBLE', 'FLOWER', 'CONCENTRATES', 'BEVERAGE', 'TINCTURES', 'ACCESSORIES'];
   deliveryAvailable: boolean = false;
@@ -116,36 +117,36 @@ export class ToolsComponent {
     }
   }
 
-  clearNotificationForm() {
-    this.title = '';
-    this.body = '';
-    this.imageUrl = '';
-    this.selectedFileName = null;
+  // clearNotificationForm() {
+  //   this.title = '';
+  //   this.body = '';
+  //   this.imageUrl = '';
+  //   this.selectedFileName = null;
   
-    // Reset file input
-    const fileInput = document.getElementById('fileInput') as HTMLInputElement;
-    if (fileInput) {
-      fileInput.value = ''; // Clears file input
-    }
-  }
+  //   // Reset file input
+  //   const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+  //   if (fileInput) {
+  //     fileInput.value = ''; // Clears file input
+  //   }
+  // }
 
-  onFileSelected(event: any) {
-    const file: File = event.target.files[0];
+  // onFileSelected(event: any) {
+  //   const file: File = event.target.files[0];
 
-    console.log(file)
+  //   console.log(file)
 
-    if (file) {
-      this.adminService.uploadImage(file).subscribe({
-        next: (response) => {
-          this.imageUrl = response.imageUrl; // Get public URL from backend
-          console.log('Image uploaded, public URL:', this.imageUrl);
-        },
-        error: (error) => {
-          console.error('Error uploading image:', error);
-        }
-      });
-    }
-  }
+  //   if (file) {
+  //     this.adminService.uploadImage(file).subscribe({
+  //       next: (response) => {
+  //         this.imageUrl = response.imageUrl; // Get public URL from backend
+  //         console.log('Image uploaded, public URL:', this.imageUrl);
+  //       },
+  //       error: (error) => {
+  //         console.error('Error uploading image:', error);
+  //       }
+  //     });
+  //   }
+  // }
 
   onEventFileSelected(event: any) {
     const file = event.target.files[0];
@@ -200,36 +201,36 @@ export class ToolsComponent {
       });
   }
 
-  sendNotification() {
-    if (!this.title || !this.body) {
-        console.error('Title and body are required!');
-        return;
-    }
+//   sendNotification() {
+//     if (!this.title || !this.body) {
+//         console.error('Title and body are required!');
+//         return;
+//     }
 
-    if (this.selectedCategory) {
-        // Send to a specific category group
-        this.adminService.sendPushNotificationToCategory(this.title, this.body, this.selectedCategory, this.imageUrl)
-            .subscribe({
-                next: (response) => {
-                    console.log('Category notification sent:', response);
-                },
-                error: (error) => {
-                    console.error('Error sending category notification:', error);
-                }
-            });
-    } else {
-        // Send to all users
-        this.adminService.sendPushNotificationToAll(this.title, this.body, this.imageUrl)
-            .subscribe({
-                next: (response) => {
-                    console.log('Notification sent:', response);
-                },
-                error: (error) => {
-                    console.error('Error sending notification:', error);
-                }
-            });
-    }
-}
+//     if (this.selectedCategory) {
+//         // Send to a specific category group
+//         this.adminService.sendPushNotificationToCategory(this.title, this.body, this.selectedCategory, this.imageUrl)
+//             .subscribe({
+//                 next: (response) => {
+//                     console.log('Category notification sent:', response);
+//                 },
+//                 error: (error) => {
+//                     console.error('Error sending category notification:', error);
+//                 }
+//             });
+//     } else {
+//         // Send to all users
+//         this.adminService.sendPushNotificationToAll(this.title, this.body, this.imageUrl)
+//             .subscribe({
+//                 next: (response) => {
+//                     console.log('Notification sent:', response);
+//                 },
+//                 error: (error) => {
+//                     console.error('Error sending notification:', error);
+//                 }
+//             });
+//     }
+// }
 
 clearEventForm() {
   this.eventTitle = '';
