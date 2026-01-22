@@ -150,3 +150,30 @@
   background: #0b0d10;
   min-height: 100%;
 }
+
+.mobile-close {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .mobile-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: absolute;
+    top: 14px;
+    right: 14px;
+
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 10;
+  }
+}

@@ -53,7 +53,7 @@ export class ToolsComponent {
 
   addBannerFile?: File;
 
-  tabs: string[] = ['Notifications/Email Blasts', 'Banners', 'Events', 'Delivery Zones'];
+  tabs: string[] = ['Notifications', 'Banners'];
   selectedTab = 0;
 
   isSavingZone: boolean = false;

@@ -10,58 +10,45 @@
     <!-- Controls group -->
    <div class="header-controls">
 
-      <!-- RANGE GROUP -->
-      <div class="range-group">
+  <!-- RANGE BUTTONS -->
+  <div class="range-buttons">
+    <button
+      *ngFor="let r of metricsRanges"
+      [class.active]="selectedMetricsRange === r.value"
+      (click)="setMetricsRange(r.value)">
+      {{ r.label }}
+    </button>
+  </div>
 
-        <!-- RANGE SELECT -->
-        <mat-form-field appearance="outline" class="range-select">
-          <mat-label>Range</mat-label>
-          <mat-select
-            [(value)]="selectedMetricsRange"
-            (selectionChange)="onMetricsRangeChange($event.value)">
-            <mat-option value="ytd">Year to Date</mat-option>
-            <mat-option value="30d">Last 30 Days</mat-option>
-            <mat-option value="7d">Last 7 Days</mat-option>
-            <mat-option value="custom">Custom</mat-option>
-          </mat-select>
-        </mat-form-field>
+  <!-- CUSTOM RANGE -->
+  <div class="custom-range" *ngIf="selectedMetricsRange === 'custom'">
+    <mat-form-field appearance="outline" class="range-input">
+      <mat-date-range-input [rangePicker]="picker">
+        <input
+          matStartDate
+          placeholder="Start"
+          [(ngModel)]="customStartDate"
+        />
+        <input
+          matEndDate
+          placeholder="End"
+          [(ngModel)]="customEndDate"
+        />
+      </mat-date-range-input>
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-date-range-picker #picker></mat-date-range-picker>
+    </mat-form-field>
 
-        <div class="inline-dates" *ngIf="selectedMetricsRange === 'custom'">
+    <button
+      class="apply-btn"
+      [disabled]="!customStartDate || !customEndDate"
+      (click)="applyCustomRange()">
+      Apply
+    </button>
+  </div>
 
-          <mat-form-field appearance="outline" class="range-input">
-            <mat-label>Date range</mat-label>
+</div>
 
-            <mat-date-range-input [rangePicker]="picker">
-              <input
-                matStartDate
-                placeholder="Start"
-                [(ngModel)]="customStartDate"
-              />
-              <input
-                matEndDate
-                placeholder="End"
-                [(ngModel)]="customEndDate"
-              />
-            </mat-date-range-input>
-
-            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-date-range-picker #picker></mat-date-range-picker>
-          </mat-form-field>
-
-          <button
-            mat-flat-button
-            color="primary"
-            class="apply-inline"
-            [disabled]="!customStartDate || !customEndDate"
-            (click)="applyCustomRange()">
-            Apply
-          </button>
-
-        </div>
-
-
-      </div>
-    </div>
 
   </header>
 
@@ -134,7 +121,12 @@
           <button mat-stroked-button (click)="openProductBreakdownModal()">View Full Breakdown</button>
         </div>
         <div class="chart-wrap small">
-          <canvas baseChart [data]="categoryChartData" [options]="chartOptions" [type]="'pie'"></canvas>
+         <canvas
+            baseChart
+            [data]="categoryChartData"
+            [options]="pieChartOptions"
+            [type]="'pie'"
+          ></canvas>
         </div>
       </div>
 
@@ -161,8 +153,18 @@
           <p class="chart-subtitle">New vs Returning vs Inactive</p>
         </div>
       </div>
+      <div class="retention-summary">
+        <span>New: <strong>{{ latestNewCustomers }}%</strong></span>
+        <span>Returning: <strong>{{ latestReturningCustomers }}%</strong></span>
+        <span>Inactive: <strong>{{ latestDormantCustomers }}%</strong></span>
+      </div>
       <div class="chart-wrap">
-        <canvas baseChart [data]="customerRetentionTrendData" [options]="chartOptions" [type]="'line'"></canvas>
+       <canvas
+          baseChart
+          [data]="customerRetentionTrendData"
+          [options]="retentionChartOptions"
+          [type]="'line'"
+        ></canvas>
       </div>
     </div>
 

@@ -51,10 +51,160 @@ export class OverviewComponent {
   customerRetentionTrendData: ChartData<'line'> = { datasets: [] };
   loyaltyRedemptionsChartData: ChartData<'bar'> = { datasets: [] };
 
+  latestNewCustomers = 0;
+  latestReturningCustomers = 0;
+  latestDormantCustomers = 0;
+
+
+  private readonly gridColor = 'rgba(17, 24, 39, 0.08)';   // subtle gray
+  private readonly tickColor = 'rgba(17, 24, 39, 0.55)';
+  private readonly titleColor = '#111827';
+
   chartOptions: ChartOptions<'line' | 'pie' | 'bar' | 'doughnut'> = {
     responsive: true,
     maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+          color: this.tickColor,
+          boxWidth: 10,
+          boxHeight: 10,
+          usePointStyle: true,
+          pointStyle: 'circle',
+          padding: 16,
+          font: { size: 12, weight: 600 }
+        }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(17, 24, 39, 0.95)',
+        titleColor: '#fff',
+        bodyColor: '#fff',
+        padding: 12,
+        displayColors: true,
+        cornerRadius: 10,
+        callbacks: {
+          // optional: format numbers nicely
+          label: (ctx: any) => {
+            const label = ctx.dataset?.label ? `${ctx.dataset.label}: ` : '';
+            const val = ctx.raw;
+            if (typeof val === 'number') {
+              return label + val.toLocaleString(undefined, { maximumFractionDigits: 0 });
+            }
+            return label + val;
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: this.gridColor, drawTicks: false },
+        ticks: {
+          color: this.tickColor,
+          maxTicksLimit: 8
+        },
+        border: { display: false }
+      },
+      y: {
+        grid: { color: this.gridColor, drawTicks: false },
+        ticks: {
+          color: this.tickColor,
+          font: { size: 11 },
+          callback: (v: any) => {
+            // if these are dollars
+            const num = Number(v);
+            if (Number.isFinite(num)) return '$' + num.toLocaleString();
+            return v;
+          }
+        },
+        border: { display: false }
+      }
+    },
+    elements: {
+      line: { tension: 0.35, borderWidth: 2 },
+      point: { radius: 0, hoverRadius: 5, hitRadius: 12 }
+    }
   };
+
+  pieChartOptions: ChartOptions<'pie' | 'doughnut'> = {
+    responsive: true,
+    maintainAspectRatio: true, // 🔑 CRITICAL
+    aspectRatio: 1.4,          // nice wide look
+    plugins: {
+      legend: {
+        position: 'right',     // 🔑 avoids vertical squash
+        labels: {
+          boxWidth: 10,
+          boxHeight: 10,
+          padding: 14,
+          font: {
+            size: 12,
+            weight: 600
+          },
+          color: this.tickColor,
+          usePointStyle: true
+        }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(17, 24, 39, 0.95)',
+        titleColor: '#fff',
+        bodyColor: '#fff',
+        padding: 12,
+        cornerRadius: 10
+      }
+    }
+  };
+
+  retentionChartOptions: ChartOptions<'line'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: {
+          color: this.tickColor,
+          font: { size: 12, weight: 600 },
+          usePointStyle: true,
+          padding: 16
+        }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(17, 24, 39, 0.95)',
+        callbacks: {
+          label: (ctx: any) => {
+            const val = ctx.raw;
+            return `${ctx.dataset.label}: ${val.toFixed(1)}%`;
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: { color: this.tickColor }
+      },
+      y: {
+        stacked: true,
+        min: 0,
+        max: 100,
+        ticks: {
+          color: this.tickColor,
+          callback: (v: any) => `${v}%`
+        },
+        grid: {
+          color: 'rgba(17, 24, 39, 0.06)'
+        }
+      }
+    },
+    elements: {
+      line: { tension: 0.35, borderWidth: 1.5 },
+      point: { radius: 0 }
+    }
+  };
+
 
   topCategories: { name: string; sales: number }[] = [];
   topProducts: { name: string; sales: number }[] = [];
@@ -70,6 +220,13 @@ export class OverviewComponent {
     percentOfTotalUnits: number;
     percentOfTotalRevenue: number;
   }[] = [];
+
+  metricsRanges = [
+    { label: 'YTD', value: 'ytd' },
+    { label: '30D', value: '30d' },
+    { label: '7D', value: '7d' },
+    { label: 'Custom', value: 'custom' }
+  ] as const;
 
   showModal = false;
 
@@ -92,8 +249,7 @@ export class OverviewComponent {
   tabs: string[] = [
     'Overall Sales',
     'Product Metrics',
-    'Loyalty Users',
-    'Budtender Metrics'
+    'Loyalty Users'
   ];
   selectedTab = 0;
   selectedDateRange: string = '30d';
@@ -163,6 +319,16 @@ customEndDate: Date | null = null;
 
   }
   
+  setMetricsRange(range: 'ytd' | '30d' | '7d' | 'custom') {
+    this.selectedMetricsRange = range;
+
+    if (range !== 'custom') {
+      this.customStartDate = null;
+      this.customEndDate = null;
+      this.onMetricsRangeChange(range);
+    }
+  }
+
   openProductBreakdownModal() {
     const productMap: { [key: string]: {
       title: string;
@@ -310,26 +476,27 @@ customEndDate: Date | null = null;
   }
 
   generateSalesChart(orders: any[]) {
-    const salesOverTime: { [date: string]: number } = {};
+    const salesOverTime: Record<string, number> = {};
 
-    orders.forEach(order => {
-      const date = new Date(order.createdAt).toISOString().split('T')[0];
-      salesOverTime[date] = (salesOverTime[date] || 0) + order.total_amount;
+    orders.forEach(o => {
+      const d = new Date(o.createdAt).toISOString().split('T')[0];
+      salesOverTime[d] = (salesOverTime[d] || 0) + Number(o.total_amount);
     });
 
     this.salesChartData = {
       labels: Object.keys(salesOverTime),
       datasets: [
         {
-          label: 'Sales Over Time',
+          label: 'Sales',
           data: Object.values(salesOverTime),
-          borderColor: 'blue',
-          backgroundColor: 'rgba(0,0,255,0.1)',
-          fill: true,
+          borderColor: '#6E9277',
+          backgroundColor: 'rgba(110, 146, 119, 0.18)',
+          fill: true
         }
       ]
     };
   }
+
 
   generateCategoryChart(orders: any[]) {
     const categoryData: { 
@@ -377,9 +544,14 @@ customEndDate: Date | null = null;
           label: 'Category Sales',
           data: totalSalesData,
           backgroundColor: [
-            '#ff6384', '#36a2eb', '#ffcd56', '#4bc0c0', '#9966ff',
-            '#ff9f40', '#ff6384', '#c9cbcf', '#ff6384', '#4bc0c0'
+            '#6E9277',
+            '#9BB6A3',
+            '#C7D9CE',
+            '#E3EEE8',
+            '#BFD1C5'
           ],
+          borderWidth: 0
+
         }
       ]
     };
@@ -433,127 +605,141 @@ customEndDate: Date | null = null;
       labels: Object.keys(hoursMap),
       datasets: [
         {
-          label: 'Sales Per Hour ($)',
+          label: 'Sales / Hour',
           data: Object.values(hoursMap),
-          borderColor: 'red',
-          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          borderColor: '#111827',
+          backgroundColor: 'rgba(17, 24, 39, 0.08)',
           fill: true
+        }
+      ]
+    };
+
+  }
+
+  generateCustomerRetentionTrend(users: any[], orders: any[]) {
+    if (!orders.length) return;
+
+    // ---------------------------------------------
+    // 1️⃣ Build user purchase history
+    // ---------------------------------------------
+    const userHistory: Record<string, { first: string; last: string }> = {};
+
+    orders.forEach(order => {
+      if (!order.createdAt || !order.user_id) return;
+
+      const month = new Date(order.createdAt).toISOString().slice(0, 7);
+      const id = order.user_id;
+
+      if (!userHistory[id]) {
+        userHistory[id] = { first: month, last: month };
+      } else {
+        userHistory[id].last = month;
+      }
+    });
+
+    // ---------------------------------------------
+    // 2️⃣ Build full month range (ALL TIME)
+    // ---------------------------------------------
+    const firstOrderMonth = Object.values(userHistory)
+      .map(u => u.first)
+      .sort()[0];
+
+    const start = new Date(firstOrderMonth + '-01');
+    const end = new Date();
+
+    const months: string[] = [];
+    const cursor = new Date(start);
+
+    while (cursor <= end) {
+      months.push(cursor.toISOString().slice(0, 7));
+      cursor.setMonth(cursor.getMonth() + 1);
+    }
+
+    // ---------------------------------------------
+    // 3️⃣ Classify users PER MONTH
+    // ---------------------------------------------
+    const newData: number[] = [];
+    const returningData: number[] = [];
+    const inactiveData: number[] = [];
+
+    months.forEach(month => {
+      let newCount = 0;
+      let returningCount = 0;
+      let inactiveCount = 0;
+
+      Object.values(userHistory).forEach(user => {
+        if (user.first === month) {
+          newCount++;
+        } else if (user.last === month) {
+          returningCount++;
+        } else if (user.last < month) {
+          inactiveCount++;
+        }
+      });
+
+      const total = newCount + returningCount + inactiveCount || 1;
+
+      newData.push((newCount / total) * 100);
+      returningData.push((returningCount / total) * 100);
+      inactiveData.push((inactiveCount / total) * 100);
+    });
+
+    // ---------------------------------------------
+    // 4️⃣ Latest summary values (for UI)
+    // ---------------------------------------------
+    const lastIndex = months.length - 1;
+
+    this.latestNewCustomers = Number(newData[lastIndex].toFixed(1));
+    this.latestReturningCustomers = Number(returningData[lastIndex].toFixed(1));
+    this.latestDormantCustomers = Number(inactiveData[lastIndex].toFixed(1));
+
+    // ---------------------------------------------
+    // 5️⃣ Assign chart data (STACKED % AREA)
+    // ---------------------------------------------
+    this.customerRetentionTrendData = {
+      labels: months,
+      datasets: [
+        {
+          label: 'New',
+          data: newData,
+          backgroundColor: 'rgba(110, 146, 119, 0.6)',
+          borderColor: '#6E9277',
+          fill: true,
+          stack: 'retention'
+        },
+        {
+          label: 'Returning',
+          data: returningData,
+          backgroundColor: 'rgba(59, 130, 246, 0.6)',
+          borderColor: '#3B82F6',
+          fill: true,
+          stack: 'retention'
+        },
+        {
+          label: 'Inactive',
+          data: inactiveData,
+          backgroundColor: 'rgba(239, 68, 68, 0.55)',
+          borderColor: '#EF4444',
+          fill: true,
+          stack: 'retention'
         }
       ]
     };
   }
 
-  
-generateCustomerRetentionTrend(users: any[], orders: any[]) {
-    const retentionData: { 
-        [month: string]: { newCustomers: Set<string>; returningCustomers: Set<string>; dormantCustomers: Set<string> } 
-    } = {};
 
-    const userFirstPurchase: { [userId: string]: string } = {};
-    const lastPurchase: { [userId: string]: string } = {};
+  private getMonthRange(start: Date, end: Date): string[] {
+    const months: string[] = [];
+    const current = new Date(start.getFullYear(), start.getMonth(), 1);
 
-    orders.forEach(order => {
-        if (!order.createdAt) return;
-        const date = new Date(order.createdAt);
-        if (isNaN(date.getTime())) return;
-        
-        const month = date.toISOString().slice(0, 7);
-        if (!userFirstPurchase[order.user_id]) {
-            userFirstPurchase[order.user_id] = month;
-        }
-        lastPurchase[order.user_id] = month;
-    });
+    while (current <= end) {
+      months.push(current.toISOString().slice(0, 7)); // YYYY-MM
+      current.setMonth(current.getMonth() + 1);
+    }
 
-    const currentDate = new Date();
-    const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(currentDate.getMonth() - 6);
-    const sixMonthsAgoStr = sixMonthsAgo.toISOString().slice(0, 7);
+    return months;
+  }
 
-    users.forEach(user => {
-        const userId = user.id;
-        if (!lastPurchase[userId] || lastPurchase[userId] > sixMonthsAgoStr) return;
-        
-        const inactiveMonth = new Date(lastPurchase[userId]);
-        inactiveMonth.setMonth(inactiveMonth.getMonth() + 6);
-        const inactiveMonthStr = inactiveMonth.toISOString().slice(0, 7);
-
-        if (!retentionData[inactiveMonthStr]) {
-            retentionData[inactiveMonthStr] = { newCustomers: new Set(), returningCustomers: new Set(), dormantCustomers: new Set() };
-        }
-        retentionData[inactiveMonthStr].dormantCustomers.add(userId);
-    });
-
-    orders.forEach(order => {
-        const userId = order.user_id;
-        if (!order.createdAt) return;
-        
-        const orderMonth = new Date(order.createdAt).toISOString().slice(0, 7);
-        const firstPurchaseMonth = userFirstPurchase[userId];
-
-        if (!retentionData[orderMonth]) {
-            retentionData[orderMonth] = { newCustomers: new Set(), returningCustomers: new Set(), dormantCustomers: new Set() };
-        }
-
-        if (orderMonth === firstPurchaseMonth) {
-            retentionData[orderMonth].newCustomers.add(userId);
-        } else {
-            retentionData[orderMonth].returningCustomers.add(userId);
-        }
-    });
-
-    const labels = Object.keys(retentionData).sort(); 
-
-    const totalUsersEachMonth = labels.map(month => {
-        return (retentionData[month]?.newCustomers.size || 0) + 
-               (retentionData[month]?.returningCustomers.size || 0) +
-               (retentionData[month]?.dormantCustomers.size || 0);
-    });
-
-    const newCustomersData = labels.map((month, index) => 
-        totalUsersEachMonth[index] ? ((retentionData[month]?.newCustomers.size || 0) / totalUsersEachMonth[index]) * 100 : 0
-    );
-
-    const returningCustomersData = labels.map((month, index) => 
-        totalUsersEachMonth[index] ? ((retentionData[month]?.returningCustomers.size || 0) / totalUsersEachMonth[index]) * 100 : 0
-    );
-
-    const dormantCustomersData = labels.map((month, index) =>
-        totalUsersEachMonth[index] ? ((retentionData[month]?.dormantCustomers.size || 0) / totalUsersEachMonth[index]) * 100 : 0
-    );
-
-    const latestIndex = labels.length - 1;
-    const latestNewCustomers = newCustomersData[latestIndex]?.toFixed(1) || "0";
-    const latestReturningCustomers = returningCustomersData[latestIndex]?.toFixed(1) || "0";
-    const latestDormantCustomers = dormantCustomersData[latestIndex]?.toFixed(1) || "0";
-
-    this.customerRetentionTrendData = {
-        labels: labels,
-        datasets: [
-            {
-                label: `New (${latestNewCustomers}%)`,
-                data: newCustomersData,
-                backgroundColor: 'rgba(255, 205, 86, 0.5)',
-                borderColor: 'rgba(255, 205, 86, 1)',
-                fill: true
-            },
-            {
-                label: `Returning (${latestReturningCustomers}%)`,
-                data: returningCustomersData,
-                backgroundColor: 'rgba(75, 192, 192, 0.5)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                fill: true
-            },
-            {
-                label: `Not Active (${latestDormantCustomers}%)`,
-                data: dormantCustomersData,
-                backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                borderColor: 'rgba(255, 99, 132, 1)',
-                fill: true
-            }
-        ]
-    };
-
-}
   
   
 
@@ -598,17 +784,16 @@ generateCustomerRetentionTrend(users: any[], orders: any[]) {
   }
   
   filterSalesData(from: Date, to: Date) {
-    this.dataService.orders$.subscribe(orders => {
-      const filtered = orders.filter(order => {
-        const orderDate = new Date(order.createdAt);
-        return orderDate >= from && orderDate <= to;
-      });
-  
-      this.generateSalesChart(filtered);
-      this.generatePeakHoursChart(filtered);
+    const filtered = this.allOrders.filter(o => {
+      const d = new Date(o.createdAt);
+      return d >= from && d <= to;
     });
+
+    this.generateSalesChart(filtered);
+    this.generatePeakHoursChart(filtered);
+    this.chart?.update(); // make sure redraw happens
   }
-  
+
   onMetricsRangeChange(range: string) {
     const now = new Date();
     let from = new Date();

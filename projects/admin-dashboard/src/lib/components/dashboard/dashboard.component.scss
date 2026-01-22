@@ -73,10 +73,13 @@
 }
 
 .sidenav {
-  width: auto;
+
   background-color: #212121;
   color: white;
   border-radius: 0;
+   width: 320px; /* ⬅️ change this */
+  max-width: 90vw; /* safety for small screens */
+  padding: 20px;
 }
 
 .topbar {

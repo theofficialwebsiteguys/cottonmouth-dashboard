@@ -1,69 +1,66 @@
-<mat-sidenav-container class="sidenav-container">
-  <mat-sidenav
-    #sidenav
-    class="sidenav"
-    [mode]="isMobile ? 'over' : 'side'"
-    [opened]="!isMobile"
+<!-- Mobile close button -->
+<button
+  class="mobile-close"
+  *ngIf="isMobile"
+  (click)="linkClicked.emit()"
+  aria-label="Close navigation"
+>
+  ✕
+</button>
+
+<!-- Brand -->
+<div class="brand">
+  <img class="brand-logo" src="assets/logo.png" alt="Dashboard Logo" />
+  <div class="brand-meta">
+    <div class="brand-title">Admin</div>
+    <div class="brand-subtitle">Dashboard</div>
+  </div>
+</div>
+
+<!-- Nav -->
+<nav class="nav">
+  <div class="nav-section-label">Overview</div>
+
+  <a
+    class="nav-item"
+    routerLink="/dashboard/overview"
+    routerLinkActive="active"
+    (click)="linkClicked.emit()"
   >
-    <!-- Brand -->
-    <div class="brand">
-      <img class="brand-logo" src="assets/logo.png" alt="Dashboard Logo" />
-      <div class="brand-meta">
-        <div class="brand-title">Admin</div>
-        <div class="brand-subtitle">Dashboard</div>
-      </div>
-    </div>
+    <i class="fa-solid fa-chart-line"></i>
+    <span class="nav-text">Dashboard</span>
+  </a>
 
-    <!-- Nav -->
-    <nav class="nav">
-      <div class="nav-section-label">Overview</div>
+  <a
+    class="nav-item"
+    routerLink="/dashboard/orders"
+    routerLinkActive="active"
+    (click)="linkClicked.emit()"
+  >
+    <i class="fa-solid fa-cart-shopping nav-icon"></i>
+    <span class="nav-text">Orders</span>
+  </a>
 
-      <a
-        class="nav-item"
-        routerLink="/dashboard/overview"
-        routerLinkActive="active"
-        (click)="handleNavClick()"
-      >
-        <i class="fa-solid fa-chart-line"></i>
-        <span class="nav-text">Dashboard</span>
-      </a>
+  <a
+    class="nav-item"
+    routerLink="/dashboard/users"
+    routerLinkActive="active"
+    (click)="linkClicked.emit()"
+  >
+    <i class="fa-solid fa-users nav-icon"></i>
+    <span class="nav-text">Loyalty Members</span>
+  </a>
 
-      <a
-        class="nav-item"
-        routerLink="/dashboard/orders"
-        routerLinkActive="active"
-        (click)="handleNavClick()"
-      >
-        <i class="fa-solid fa-cart-shopping nav-icon"></i>
-        <span class="nav-text">Orders</span>
-      </a>
+  <div class="nav-divider"></div>
+  <div class="nav-section-label">Management</div>
 
-      <a
-        class="nav-item"
-        routerLink="/dashboard/users"
-        routerLinkActive="active"
-        (click)="handleNavClick()"
-      >
-        <i class="fa-solid fa-users nav-icon"></i>
-        <span class="nav-text">Loyalty Members</span>
-      </a>
-
-      <div class="nav-divider"></div>
-      <div class="nav-section-label">Management</div>
-
-      <a
-        class="nav-item"
-        routerLink="/dashboard/tools"
-        routerLinkActive="active"
-        (click)="handleNavClick()"
-      >
-        <i class="fa-solid fa-toolbox nav-icon"></i>
-        <span class="nav-text">Admin Controls</span>
-      </a>
-    </nav>
-  </mat-sidenav>
-
-  <mat-sidenav-content class="content">
-    <ng-content></ng-content>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+  <a
+    class="nav-item"
+    routerLink="/dashboard/tools"
+    routerLinkActive="active"
+    (click)="linkClicked.emit()"
+  >
+    <i class="fa-solid fa-toolbox nav-icon"></i>
+    <span class="nav-text">Admin Controls</span>
+  </a>
+</nav>

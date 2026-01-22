@@ -1,3 +1,6 @@
+/* =========================
+   PAGE SHELL
+========================= */
 .page-shell {
   padding: 24px;
   background: #f4f6f8;
@@ -5,7 +8,9 @@
   font-family: Inter, system-ui, sans-serif;
 }
 
-/* ================= PAGE HEADER ================= */
+/* =========================
+   HEADER
+========================= */
 .orders-header {
   display: flex;
   justify-content: space-between;
@@ -19,60 +24,89 @@
   }
 }
 
-/* ================= CONTROLS ================= */
+/* =========================
+   HEADER CONTROLS
+========================= */
 .header-controls {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-/* ================= SEARCH ================= */
-.search-wrapper {
-  width: 360px; /* PRIMARY CONTROL */
-}
+/* =========================
+   SEARCH
+========================= */
+// .search-wrapper {
+//   width: 360px;
+// }
 
-.search-wrapper input {
-  width: 90%;
-  height: 40px;
-  padding: 0 14px;
-  border-radius: 10px;
-  border: 1px solid #d1d5db;
-  font-size: 14px;
-  background: #fff;
 
-  &:focus {
-    outline: none;
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
-  }
-}
 
-/* ================= DATE RANGE ================= */
+/* =========================
+   DATE RANGE
+========================= */
 .date-range {
   display: flex;
   align-items: center;
   gap: 8px;
+
+  .range-input {
+    width: 260px;
+  }
+
+  .apply-range {
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 8px;
+    background: #111827;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
 }
 
-.date-range .range-input {
-  width: 260px;
-}
-
-/* normalize Material height */
-.date-range .mat-form-field-flex {
+/* Normalize Material height */
+.mat-form-field-flex {
   height: 40px;
 }
 
-.date-range .apply-range {
-  height: 40px;
-  padding: 0 14px;
-  border-radius: 8px;
-  background: #111827;
-  color: #fff;
-  border: none;
+/* =========================
+   RANGE PRESETS
+========================= */
+.range-presets {
+  display: flex;
+  gap: 6px;
+
+  button {
+    height: 32px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    font-size: 12px;
+    cursor: pointer;
+    color: #374151;
+
+    &:hover {
+      background: #f3f4f6;
+    }
+
+    &.active {
+      background: #111827;
+      color: #fff;
+      border-color: #111827;
+    }
+  }
 }
 
-/* ================= EXPORT ================= */
+/* =========================
+   EXPORT
+========================= */
 .export-btn {
   height: 40px;
   padding: 0 14px;
@@ -87,58 +121,44 @@
   }
 }
 
-
-.header-actions {
-  display: flex;
-  gap: 10px;
-
-  input {
-    height: 32px;
-    padding: 0 10px;
-    border-radius: 6px;
-    border: 1px solid #d0d4db;
-    font-size: 13px;
-  }
-
-  button {
-    padding: 6px 12px;
-    border-radius: 6px;
-    border: 1px solid #d0d4db;
-    background: #fff;
-    cursor: pointer;
-    font-size: 13px;
-  }
-}
-
-/* ================= SUMMARY ================= */
+/* =========================
+   SUMMARY
+========================= */
 .summary-row {
   display: flex;
   gap: 40px;
   margin-bottom: 16px;
 
-  div span {
-    display: block;
-    font-size: 12px;
-    color: #6b7280;
-  }
+  div {
+    span {
+      display: block;
+      font-size: 12px;
+      color: #6b7280;
+    }
 
-  div strong {
-    font-size: 14px;
-    font-weight: 600;
+    strong {
+      font-size: 14px;
+      font-weight: 600;
+      color: #111827;
+    }
   }
 }
 
-/* ================= TABLE CARD ================= */
+/* =========================
+   TABLE CARD
+========================= */
 .orders-table-card {
   background: #fff;
   border-radius: 12px;
   box-shadow:
     0 1px 2px rgba(16, 24, 40, 0.06),
     0 8px 24px rgba(16, 24, 40, 0.08);
-  overflow: hidden; /* clean edges */
+  overflow: hidden;
 }
 
-/* ================= TABLE HEADER ================= */
+/* =========================
+   TABLE HEADER / ROWS
+========================= */
 .table-header,
 .table-row {
   display: grid;
@@ -162,7 +182,9 @@
   border-bottom: 1px solid #e4e6eb;
 }
 
-/* ================= TABLE BODY ================= */
+/* =========================
+   TABLE BODY
+========================= */
 .table-body {
   max-height: 60vh;
   overflow-y: auto;
@@ -178,7 +200,9 @@
   }
 }
 
-/* ================= CELLS ================= */
+/* =========================
+   CELLS
+========================= */
 .mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
@@ -199,7 +223,9 @@
   font-weight: 600;
 }
 
-/* ================= STATUS ================= */
+/* =========================
+   STATUS
+========================= */
 .status {
   font-size: 12px;
   padding: 4px 10px;
@@ -207,31 +233,70 @@
   width: fit-content;
   background: #fff3cd;
   color: #92400e;
+
+  &.pending {
+    background: #fde68a;
+    color: #92400e;
+  }
 }
 
-/* ================= DATE ================= */
+/* =========================
+   DATE
+========================= */
 .date {
   font-size: 12px;
   color: #6b7280;
 }
 
-.date-range {
+.header-controls {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 8px;
-
-  .range-input {
-    width: 260px;
-  }
-
-  .apply-range {
-    height: 40px;
-  }
-  
+  gap: 16px;
 }
 
-.date-range .apply-range {
-  background: #111827;
-  color: #fff;
-  border: none;
+/* LEFT SIDE (search + presets) */
+.filters-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0; /* CRITICAL for flex overflow */
+}
+
+/* RIGHT SIDE */
+.filters-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* SEARCH FIX */
+.search-wrapper {
+  width: 280px; /* reduced from 360 */
+  flex-shrink: 0;
+}
+
+.search-wrapper input {
+  width: 90%;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  background: #fff;
+
+  &:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  }
+}
+
+.points {
+  font-weight: 500;
+  color: #6b7280; /* neutral gray */
+}
+
+.points.redeemed {
+  color: #dc2626; /* red */
 }

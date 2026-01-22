@@ -16,49 +16,27 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   styleUrl: './user-detail.component.scss'
 })
 export class UserDetailComponent {
-  @ViewChild(MatSort) sort!: MatSort;
-  @Input() user: any;
+   @Input() user: any;
   @Output() closeDetail = new EventEmitter<void>();
-  @Output() orderSelected = new EventEmitter<any>(); // Emits the selected order
-  userOrdersData = new MatTableDataSource<any>();
+  @Output() orderSelected = new EventEmitter<any>();
 
   editMode = false;
-  editablePoints!: number;
-  editableRole!: string;
+  saving = false;
+
   editableFname!: string;
   editableLname!: string;
   editableEmail!: string;
   editablePhone!: string;
   editableCountry!: string;
 
-  saving = false;
-
-  constructor(private adminService: AdminService){}
-
-  ngOnChanges() {
-    if (this.user && this.user.orders) {
-      this.userOrdersData.data = this.user.orders;
-  
-      if (this.sort) {
-        this.userOrdersData.sort = this.sort;
-      }
-    }
-  }
-  
-  ngAfterViewInit() {
-    if (this.sort) {
-      this.userOrdersData.sort = this.sort;
-    }
-  }
-  
-  
+  constructor(private adminService: AdminService) {}
 
   close() {
     this.closeDetail.emit();
   }
 
   selectOrder(order: any) {
-    this.orderSelected.emit(order); // Emit the selected order to the parent
+    this.orderSelected.emit(order);
   }
 
   toggleEditMode() {
@@ -68,10 +46,7 @@ export class UserDetailComponent {
     this.editableEmail = this.user.email;
     this.editablePhone = this.user.phone;
     this.editableCountry = this.user.country;
-    this.editablePoints = this.user.points;
-    this.editableRole = this.user.role;
   }
-
 
   cancelEdit() {
     this.editMode = false;
@@ -80,56 +55,35 @@ export class UserDetailComponent {
   saveChanges() {
     this.saving = true;
 
-    const updatedUser = { 
-      id: this.user.id, 
+    const updated = {
+      id: this.user.id,
       fname: this.editableFname,
       lname: this.editableLname,
       email: this.editableEmail,
       phone: this.editablePhone,
-      country: this.editableCountry,
-      points: this.editablePoints,
-      role: this.editableRole
+      country: this.editableCountry
     };
 
-    this.adminService.updateUser(updatedUser).subscribe({
-      next: (response) => {
-        Object.assign(this.user, updatedUser);
+    this.adminService.updateUser(updated).subscribe({
+      next: () => {
+        Object.assign(this.user, updated);
         this.editMode = false;
         this.saving = false;
       },
-      error: (err) => {
-        console.error('Error updating user:', err);
-        this.saving = false;
-      }
+      error: () => (this.saving = false)
     });
   }
 
   upgradeToPremium() {
-    this.adminService.upgradeUserToPremium(this.user.phone, this.user.email).subscribe({
-      next: () => {
-        this.user.premium = true;
-        this.user.premium_start = new Date(); // optional visual feedback
-        console.log('User upgraded to premium');
-      },
-      error: (err) => {
-        console.error('Failed to upgrade user:', err);
-      }
+    this.adminService.upgradeUserToPremium(this.user.phone, this.user.email).subscribe(() => {
+      this.user.premium = true;
     });
   }
-  
+
   downgradeFromPremium() {
-    this.adminService.downgradeUserFromPremium(this.user.phone, this.user.email).subscribe({
-      next: () => {
-        this.user.premium = false;
-        this.user.premium_start = null;
-        this.user.premium_end = null;
-        console.log('User downgraded from premium');
-      },
-      error: (err) => {
-        console.error('Failed to downgrade user:', err);
-      }
+    this.adminService.downgradeUserFromPremium(this.user.phone, this.user.email).subscribe(() => {
+      this.user.premium = false;
     });
   }
-  
 
 }

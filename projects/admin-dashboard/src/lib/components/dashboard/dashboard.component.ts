@@ -36,17 +36,13 @@ export class DashboardComponent {
   constructor(private dataService: DataService) {}
 
   isMobile: boolean = false;
+  sidenavOpen = true;
 
-
-  ngOnInit(): void {
+  ngOnInit() {
     this.checkScreenSize();
   }
 
   @HostListener('window:resize')
-  onResize() {
-    this.checkScreenSize();
-  }
-
   checkScreenSize() {
     this.isMobile = window.innerWidth < 768;
   }

@@ -1,79 +1,184 @@
-.user-details-container {
-    padding: 20px;
-    // display: flex;
-    flex-direction: column;
-    max-height: 100vh; /* Prevents parent from scrolling */
-    overflow: hidden;
+.user-detail-shell {
+  padding: 24px;
+  background: #f4f6f8;
+  font-family: Inter, system-ui, sans-serif;
 }
 
-/* User Info Section */
-.user-info {
-    border-radius: 0;
-    padding: 20px;
-    margin-bottom: 20px;
+/* HEADER */
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  h1 {
+    font-size: 22px;
+    font-weight: 600;
+  }
 }
 
-/* Two-column layout */
+.back-btn {
+  border: none;
+  background: none;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* SUMMARY */
+.summary-row {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 16px;
+
+  div span {
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  div strong {
+    font-size: 14px;
+    font-weight: 600;
+  }
+}
+
+/* CARD */
+.detail-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow:
+    0 1px 2px rgba(16, 24, 40, 0.06),
+    0 8px 24px rgba(16, 24, 40, 0.08);
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+/* CARD HEADER */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+
+  h3 {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .actions button {
+    margin-left: 8px;
+  }
+}
+
+/* INFO GRID */
 .info-grid {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-}
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
 
-.info-column {
-    flex: 1;
-}
-
-/* Table should be scrollable */
-.table-container {
-    max-height: 550px; /* Adjust height as needed */
-    overflow-y: auto; /* Enables vertical scrolling */
-    overflow-x: auto; /* Enables horizontal scrolling if needed */
+  label {
+    font-size: 11px;
+    color: #6b7280;
     display: block;
-    background: white; /* Ensures the background remains visible */
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3); /* Keeps shadow effect */
+    margin-bottom: 4px;
+  }
+
+  span {
+    font-size: 13px;
+  }
+
+  input {
+    width: 90%;
+    height: 36px;
+    padding: 0 10px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+  }
 }
 
-/* Keep table header visible while scrolling */
-th {
-    position: sticky;
-    top: 0;
-    background: white;
-    z-index: 2;
+.inline-inputs {
+  display: flex;
+  gap: 8px;
 }
 
-
-th {
-    position: sticky;
-    top: 0;
-    background: rgb(168, 168, 168) !important;
-    z-index: 2;
+/* TABLE */
+.table-header,
+.table-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.2fr;
+  padding: 10px 12px;
+  align-items: center;
 }
 
-
-/* Alternate row colors */
-tr:nth-child(odd) {
-    background-color: #f9f9f9; /* Light grey */
+.table-header {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  border-bottom: 1px solid #e4e6eb;
 }
 
-tr:nth-child(even) {
-    background-color: #ffffff; /* White */
+.table-row {
+  font-size: 13px;
+  border-bottom: 1px solid #edf0f3;
+  cursor: pointer;
+
+  &:hover {
+    background: #f9fafb;
+  }
 }
 
-
-/* Ensure table header stands out */
-th {
-    background-color: #d1d1d1; /* Slightly darker grey for the header */
-    color: #333;
-    font-weight: bold;
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
-/* Borders for better column separation */
-th, td {
-    border-bottom: 1px solid #ddd; /* Light border */
-    padding: 12px;
+.total {
+  font-weight: 600;
 }
 
-tr{
-    cursor: pointer;
+.date {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Base button */
+.btn {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Primary (Edit / Save) */
+.btn.primary {
+  background: #111827;
+  color: #fff;
+
+  &:hover:not(:disabled) {
+    background: #1f2937;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+/* Ghost (Cancel) */
+.btn.ghost {
+  background: transparent;
+  color: #374151;
+  border: 1px solid #d1d5db;
+
+  &:hover {
+    background: #f3f4f6;
+  }
 }

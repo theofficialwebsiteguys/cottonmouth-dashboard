@@ -1,53 +1,87 @@
-<button mat-button (click)="goBack()">← Back</button>
-<div class="order-details-container">
+<div class="details-shell">
 
-    <h2>Order Details (ID: {{ order.id }})</h2>
-  
-    <mat-card class="order-info">
-      <h3>General Information</h3>
-      <div class="info-grid">
-        <p><strong>POS Order ID:</strong> {{ order.pos_order_id }}</p>
-        <p><strong>User ID:</strong> {{ order.user_id }}</p>
-        <p><strong>Points Added:</strong> {{ order.points_add }}</p>
-        <p><strong>Points Redeemed:</strong> {{ order.points_redeem }}</p>
-        <p><strong>Total Amount:</strong> {{ order.total_amount | currency }}</p>
-        <p><strong>Created At:</strong> {{ order.createdAt | date:'medium' }}</p>
-      </div>
-    </mat-card>
-    
-  
-    <h3>Order Items</h3>
-    <div class="table-container">
-      <table mat-table matSort [dataSource]="ordersData" class="mat-elevation-z8">
-        <ng-container matColumnDef="title">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Title</th>
-          <td mat-cell *matCellDef="let item">{{ item.title }}</td>
-        </ng-container>
-    
-        <ng-container matColumnDef="brand">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Brand</th>
-          <td mat-cell *matCellDef="let item">{{ item.brand }}</td>
-        </ng-container>
-    
-        <ng-container matColumnDef="category">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Category</th>
-          <td mat-cell *matCellDef="let item">{{ item.category }}</td>
-        </ng-container>
-    
-        <ng-container matColumnDef="quantity">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Quantity</th>
-          <td mat-cell *matCellDef="let item">{{ item.quantity }}</td>
-        </ng-container>
-    
-        <ng-container matColumnDef="price">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Price</th>
-          <td mat-cell *matCellDef="let item">{{ item.price | currency }}</td>
-        </ng-container>
-    
-        <tr mat-header-row *matHeaderRowDef="['title', 'brand', 'category', 'quantity', 'price']"></tr>
-        <tr mat-row *matRowDef="let row; columns: ['title', 'brand', 'category', 'quantity', 'price'];"></tr>
-      </table>
+  <!-- HEADER -->
+  <div class="details-header">
+    <button class="back-btn" (click)="goBack()">← Orders</button>
+
+    <div class="header-meta">
+      <h1>Order #{{ order.id }}</h1>
+      <span class="sub">
+        {{ order.createdAt | date:'medium' }}
+      </span>
     </div>
-    
+
+    <div class="header-total">
+      <span>Total</span>
+      <strong>{{ order.total_amount | currency }}</strong>
+    </div>
   </div>
-  
+
+  <!-- SUMMARY GRID -->
+  <div class="summary-grid">
+    <div>
+      <span>Customer</span>
+      <strong>
+        {{ order.Customer?.fname }} {{ order.Customer?.lname }}
+      </strong>
+      <small>{{ order.Customer?.email }}</small>
+    </div>
+
+    <div>
+      <span>Status</span>
+      <strong class="status">
+        {{ order.status || 'Pending' }}
+      </strong>
+    </div>
+
+    <div>
+      <span>POS Order</span>
+      <strong>{{ order.pos_order_id || '—' }}</strong>
+    </div>
+
+    <div>
+      <span>Points Used</span>
+      <strong>-{{ order.points_redeem || 0 }}</strong>
+    </div>
+
+    <div>
+      <span>Points Earned</span>
+      <strong>{{ order.points_add || 0 }}</strong>
+    </div>
+
+    <div>
+      <span>User ID</span>
+      <strong class="mono">{{ order.user_id }}</strong>
+    </div>
+  </div>
+
+  <!-- ITEMS TABLE -->
+  <div class="items-card">
+    <div class="items-header">
+      <h3>Items</h3>
+      <span>{{ order.items.length }} total</span>
+    </div>
+
+    <div class="items-table">
+      <div class="items-head">
+        <span>Product</span>
+        <span>Brand</span>
+        <span>Category</span>
+        <span>Qty</span>
+        <span>Price</span>
+      </div>
+
+      <div
+        class="items-row"
+        *ngFor="let item of order.items"
+      >
+        <span class="name">{{ item.title }}</span>
+        <span>{{ item.brand || '—' }}</span>
+        <span>{{ item.category }}</span>
+        <span>{{ item.quantity }}</span>
+        <span>{{ item.price | currency }}</span>
+      </div>
+    </div>
+  </div>
+
+</div>

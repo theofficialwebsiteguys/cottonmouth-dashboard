@@ -1,72 +1,72 @@
- <!-- PUSH NOTIFICATIONS -->
-      <div class="aiq-card">
+<div class="card">
 
-        <div class="card-header">
-          <h2>Push Notifications</h2>
-          <p class="muted">
-            Send real-time alerts directly to users’ devices.
-          </p>
-        </div>
+  <div class="card-header">
+    <h2>Push Notifications</h2>
+    <p class="muted">
+      Send real-time alerts directly to users’ devices.
+    </p>
+  </div>
 
-        <div class="form-section">
+  <div class="form-section">
 
-         <div class="field">
-          <label>Notification Title</label>
-          <div class="aiq-input">
-            <input
-              type="text"
-              placeholder="e.g. New special available"
-              [(ngModel)]="title"
-            />
-          </div>
-        </div>
-
-        <div class="field">
-          <label>Message</label>
-          <div class="aiq-input">
-            <textarea
-              rows="4"
-              placeholder="Write the message users will see…"
-              [(ngModel)]="body">
-            </textarea>
-          </div>
-        </div>
-
-        <div class="field">
-          <label>Audience</label>
-          <div class="aiq-input">
-            <select [(ngModel)]="selectedCategory">
-              <option value="">All Users</option>
-              <option *ngFor="let c of categories" [value]="c">
-                {{ c }}
-              </option>
-            </select>
-          </div>
-          <small class="helper">Leave blank to send to everyone.</small>
-        </div>
-
-        <div class="field">
-          <label>Optional Image</label>
-          <div class="aiq-file">
-            <input type="file" (change)="onFileSelected($event)" />
-            <span>Upload image</span>
-          </div>
-        </div>
-
-
-        </div>
-
-        <div class="card-actions">
-          <button class="ghost" (click)="clearNotificationForm()">
-            Reset
-          </button>
-
-          <button
-            class="primary"
-            [disabled]="!title || !body"
-            (click)="sendNotification()">
-            Send Notification
-          </button>
-        </div>
-
+    <div class="field">
+      <label>Notification Title</label>
+      <div class="aiq-input">
+        <input
+          type="text"
+          placeholder="New special available"
+          [(ngModel)]="title"
+        />
       </div>
+    </div>
+
+    <div class="field">
+      <label>Message</label>
+      <div class="aiq-input">
+        <textarea
+          rows="4"
+          placeholder="Write the message users will see…"
+          [(ngModel)]="body">
+        </textarea>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Audience</label>
+      <div class="aiq-input">
+        <select [(ngModel)]="selectedCategory">
+          <option value="">All Users</option>
+          <option *ngFor="let c of categories" [value]="c">
+            {{ c }}
+          </option>
+        </select>
+      </div>
+      <small class="helper">Leave blank to send to everyone</small>
+    </div>
+
+    <!-- <div class="field">
+      <label>Optional Image</label>
+      <label class="aiq-file">
+        <input type="file" (change)="onFileSelected($event)" />
+        <span>
+          Upload image (PNG / JPG)
+        </span>
+      </label>
+    </div> -->
+
+  </div>
+
+  <div class="card-actions">
+    <button class="btn ghost" (click)="clearNotificationForm()">
+      Reset
+    </button>
+
+    <button
+      class="btn primary"
+      [disabled]="!title || !body"
+      (click)="sendNotification()">
+      Send Notification
+    </button>
+  </div>
+
+</div>

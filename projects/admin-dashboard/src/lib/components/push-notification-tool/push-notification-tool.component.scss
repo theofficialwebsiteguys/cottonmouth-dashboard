@@ -1,39 +1,18 @@
+/* =========================
+   PAGE / LAYOUT
+========================= */
+
 .aiq-page {
   padding: 24px;
   max-width: 1400px;
   margin: auto;
+  font-family: Inter, system-ui, sans-serif;
+  background: #f4f6f8;
 }
 
-.aiq-header h1 {
-  font-size: 1.9rem;
-}
-
-.aiq-header p {
-  color: #666;
-}
-
-.aiq-tabs {
-  display: flex;
-  gap: 12px;
-  margin: 20px 0;
-}
-
-.aiq-tabs button {
-  padding: 10px 16px;
-  border-radius: 10px;
-  background: #eee;
-  border: none;
-  font-weight: 600;
-}
-
-.aiq-tabs button.active {
-  background: #007bff;
-  color: white;
-}
-
-.aiq-workspace {
-  margin-top: 20px;
-}
+/* =========================
+   GRID
+========================= */
 
 .aiq-grid {
   display: grid;
@@ -41,88 +20,53 @@
   gap: 20px;
 }
 
-.aiq-card {
-  background: #f9f9f9;
-  border-radius: 14px;
+/* =========================
+   CARD SYSTEM
+========================= */
+
+.aiq-card,
+.card {
+  background: #ffffff;
+  border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  box-shadow:
+    0 1px 2px rgba(16, 24, 40, 0.06),
+    0 8px 24px rgba(16, 24, 40, 0.08);
 }
 
 .aiq-card.full {
   grid-column: span 2;
 }
 
-.form-grid input,
-.form-grid textarea,
-select {
-  width: 100%;
-  margin-bottom: 12px;
-  padding: 10px;
-}
-
-.card-actions {
-  margin-top: 10px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  
-}
-
-.primary {
-  background: #007bff;
-  color: white;
-  padding: 10px 16px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-}
-
-.ghost {
-  background: transparent;
-  border: 1px solid #ccc;
-  padding: 10px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.danger {
-  background: #dc3545;
-  color: white;
-}
-
-.list-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid #ddd;
-}
-
-.map {
-  height: 400px;
-  border-radius: 12px;
-  overflow: hidden;
-}
+/* =========================
+   CARD HEADER
+========================= */
 
 .card-header {
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .card-header h2 {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
 }
 
 .card-header .muted {
   margin-top: 4px;
-  font-size: 0.9rem;
-  color: #777;
+  font-size: 12px;
+  color: #6b7280;
 }
+
+/* =========================
+   FORM LAYOUT
+========================= */
 
 .form-section {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .field {
@@ -131,27 +75,16 @@ select {
 }
 
 .field label {
-  font-size: 0.85rem;
+  font-size: 12px;
   font-weight: 600;
+  color: #374151;
   margin-bottom: 4px;
-  color: #444;
 }
 
 .field small.helper {
-  font-size: 0.75rem;
-  color: #888;
   margin-top: 4px;
-}
-
-.image-preview {
-  margin-top: 10px;
-}
-
-.image-preview img {
-  max-width: 100%;
-  max-height: 160px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
+  font-size: 11px;
+  color: #6b7280;
 }
 
 /* =========================
@@ -160,10 +93,10 @@ select {
 
 .aiq-input {
   background: #f6f8fb;
-  border: 1px solid #d8dee9;
-  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
   padding: 10px 14px;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 }
 
 .aiq-input input,
@@ -173,7 +106,7 @@ select {
   border: none;
   outline: none;
   background: transparent;
-  font-size: 0.95rem;
+  font-size: 13px;
   font-family: inherit;
   color: #111827;
   resize: none;
@@ -183,47 +116,45 @@ select {
   min-height: 90px;
 }
 
-/* Placeholder */
 .aiq-input input::placeholder,
 .aiq-input textarea::placeholder {
   color: #9ca3af;
 }
 
-/* Focus state */
 .aiq-input:focus-within {
-  border-color: #3b82f6;
   background: #ffffff;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+  border-color: #111827;
+  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.12);
 }
 
-/* Select arrow fix */
+/* Select arrow */
 .aiq-input select {
   appearance: none;
   cursor: pointer;
+  padding-right: 28px;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 20 20' fill='none' stroke='%239CA3AF' stroke-width='2' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 8px center;
-  padding-right: 28px;
+  background-position: right 10px center;
 }
 
 /* =========================
-   AIQ FILE INPUT
+   FILE INPUT
 ========================= */
 
 .aiq-file {
   position: relative;
-  border: 1px dashed #cbd5e1;
-  border-radius: 12px;
-  padding: 14px;
+  border: 1px dashed #d1d5db;
+  border-radius: 10px;
+  padding: 12px;
   text-align: center;
-  background: #f8fafc;
+  background: #f9fafb;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 }
 
 .aiq-file:hover {
-  border-color: #3b82f6;
-  background: #eff6ff;
+  border-color: #9ca3af;
+  background: #f3f4f6;
 }
 
 .aiq-file input {
@@ -234,6 +165,67 @@ select {
 }
 
 .aiq-file span {
-  font-size: 0.9rem;
-  color: #475569;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* =========================
+   ACTIONS / BUTTONS
+========================= */
+
+.card-actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.btn {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn.primary {
+  background: #111827;
+  color: #ffffff;
+}
+
+.btn.primary:hover {
+  background: #020617;
+}
+
+.btn.primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn.ghost {
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  color: #374151;
+}
+
+.btn.ghost:hover {
+  background: #f9fafb;
+}
+
+/* =========================
+   IMAGE PREVIEW (OPTIONAL)
+========================= */
+
+.image-preview {
+  margin-top: 10px;
+}
+
+.image-preview img {
+  max-width: 100%;
+  max-height: 160px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
 }

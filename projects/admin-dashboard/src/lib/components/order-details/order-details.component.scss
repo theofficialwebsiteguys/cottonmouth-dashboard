@@ -1,75 +1,159 @@
-.order-details-container{
-    padding: 20px;
-    box-sizing: border-box;
-    max-height: 700px;
-    overflow-y: auto;
-    overflow-x: hidden; /* Prevents horizontal scrolling */
-    
+.details-shell {
+  padding: 24px;
+  background: #f4f6f8;
+  height: 100%;
+  overflow-y: auto;
+  font-family: Inter, system-ui, sans-serif;
 }
 
-/* Make the table scrollable while keeping the headers fixed */
-.table-container {
-  max-height: 550px; /* Adjust height as needed */
-  overflow-y: auto; /* Enables vertical scrolling */
-  overflow-x: auto; /* Enables horizontal scrolling if needed */
-  display: block;
-  background: white; /* Ensures the background remains visible */
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3); /* Keeps shadow effect */
+/* ================= HEADER ================= */
+.details-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
-/* Keep table header visible while scrolling */
-th {
-  position: sticky;
-  top: 0;
-  background: white;
-  z-index: 2;
-}
-
-
-th {
-  position: sticky;
-  top: 0;
-  background: rgb(168, 168, 168) !important;
-  z-index: 2;
-}
-
-
-/* Alternate row colors */
-tr:nth-child(odd) {
-  background-color: #f9f9f9; /* Light grey */
-}
-
-tr:nth-child(even) {
-  background-color: #ffffff; /* White */
-}
-
-
-/* Ensure table header stands out */
-th {
-  background-color: #d1d1d1; /* Slightly darker grey for the header */
-  color: #333;
-  font-weight: bold;
-}
-
-/* Borders for better column separation */
-th, td {
-  border-bottom: 1px solid #ddd; /* Light border */
-  padding: 12px;
-}
-
-tr{
+.back-btn {
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
+  color: #111827;
 }
 
+.header-meta h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+}
 
-.order-info {
-    border-radius: 0;
-    padding: 20px;
-  }
-  
-  .info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); // auto-adjusts for screen
-    gap: 16px;
-  }
-  
+.header-meta .sub {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.header-total {
+  text-align: right;
+}
+
+.header-total span {
+  display: block;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.header-total strong {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* ================= SUMMARY ================= */
+.summary-grid {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+  box-shadow:
+    0 1px 2px rgba(16, 24, 40, 0.06),
+    0 8px 24px rgba(16, 24, 40, 0.08);
+}
+
+.summary-grid span {
+  font-size: 12px;
+  color: #6b7280;
+  display: block;
+}
+
+.summary-grid strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.summary-grid small {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.status {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #fff3cd;
+  color: #92400e;
+  font-size: 12px;
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* ================= ITEMS ================= */
+.items-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow:
+    0 1px 2px rgba(16, 24, 40, 0.06),
+    0 8px 24px rgba(16, 24, 40, 0.08);
+  overflow: hidden;
+}
+
+.items-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.items-header h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.items-header span {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* ================= TABLE ================= */
+.items-table {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.items-head,
+.items-row {
+  display: grid;
+  grid-template-columns: 2.2fr 1.5fr 1.5fr 0.8fr 1fr;
+  padding: 12px 20px;
+  align-items: center;
+}
+
+.items-head {
+  background: #fafafa;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.items-row {
+  font-size: 13px;
+  border-bottom: 1px solid #edf0f3;
+}
+
+.items-row:hover {
+  background: #f9fafb;
+}
+
+.name {
+  font-weight: 500;
+  color: #111827;
+}

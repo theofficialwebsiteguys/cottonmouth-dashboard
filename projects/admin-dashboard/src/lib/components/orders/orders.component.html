@@ -5,52 +5,45 @@
     <h1>Orders</h1>
 
     <div class="header-controls">
-      <!-- SEARCH (PRIMARY) -->
-      <div class="search-wrapper">
-        <input
-          type="text"
-          placeholder="Search by name, order ID, or POS ID"
-          [(ngModel)]="searchTerm"
-        />
-      </div>
+  <div class="filters-left">
+    <!-- SEARCH -->
+    <div class="search-wrapper">
+      <input
+        type="text"
+        placeholder="Search by name, order ID, or POS ID"
+        [(ngModel)]="searchTerm"
+        (input)="applyFilters()"
+      />
+    </div>
 
-      <!-- DATE RANGE -->
-      <div class="date-range">
-        <mat-form-field appearance="outline" class="range-input">
-          <mat-label>Date range</mat-label>
-
-          <mat-date-range-input [rangePicker]="rangePicker">
-            <input matStartDate placeholder="Start" [(ngModel)]="customStartDate" />
-            <input matEndDate placeholder="End" [(ngModel)]="customEndDate" />
-          </mat-date-range-input>
-
-          <mat-datepicker-toggle matSuffix [for]="rangePicker"></mat-datepicker-toggle>
-          <mat-date-range-picker #rangePicker></mat-date-range-picker>
-        </mat-form-field>
-
-        <button
-          mat-flat-button
-          class="apply-range"
-          [disabled]="!customStartDate || !customEndDate"
-          (click)="applyCustomRange()">
-          Apply
-        </button>
-      </div>
-
-      <!-- EXPORT -->
-      <button class="export-btn" (click)="exportToCSV()">
-        Export
+    <!-- RANGE PRESETS -->
+    <div class="range-presets">
+      <button
+        *ngFor="let r of RANGE_PRESETS"
+        [class.active]="activeRange === r"
+        (click)="setRange(r)">
+        {{ r === 'all' ? 'All time' : r.toUpperCase() }}
       </button>
     </div>
+  </div>
+
+  <!-- DATE PICKER + EXPORT -->
+  <div class="filters-right">
+    <div class="date-range">
+      <!-- date picker here -->
+    </div>
+
+    <button class="export-btn" (click)="exportToCSV()">
+      Export
+    </button>
+  </div>
+</div>
+
   </div>
 
 
   <!-- SUMMARY (NOT PART OF TABLE) -->
   <div class="summary-row">
-    <div>
-      <span>Pending Total</span>
-      <strong>{{ pendingTotal | currency }}</strong>
-    </div>
     <div>
       <span>Total Orders</span>
       <strong>{{ totalOrders }}</strong>
@@ -94,7 +87,13 @@
           <small>{{ order.items[0]?.title }}</small>
         </span>
 
-        <span class="points">-{{ order.points_redeem }}</span>
+        <span
+          class="points"
+          [class.redeemed]="order.points_redeem > 0"
+        >
+          {{ order.points_redeem > 0 ? '-' + order.points_redeem : '0' }}
+        </span>
+
 
         <span class="total">{{ order.total_amount | currency }}</span>
 

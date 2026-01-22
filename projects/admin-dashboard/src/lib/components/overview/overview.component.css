@@ -1,16 +1,25 @@
+/* =========================
+   PAGE
+========================= */
+
 .overview-page {
   padding: 24px;
   background: #f7f8fa;
   min-height: 100%;
+  font-family: Inter, system-ui, sans-serif;
 }
 
-/* Header */
+/* =========================
+   HEADER
+========================= */
+
 .overview-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
 }
 
 .overview-header h1 {
@@ -23,43 +32,83 @@
 .subtitle {
   font-size: 13px;
   color: #6b7280;
-  margin: 4px 0 0;
+  margin-top: 4px;
 }
+/* =========================
+   RANGE BUTTONS (ORDERS STYLE)
+========================= */
 
-.header-controls {
+.range-buttons {
   display: flex;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
+  gap: 6px;
 }
 
-.control {
-  min-width: 180px;
+.range-buttons button {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
 
-/* Custom range row */
+.range-buttons button:hover {
+  background: #f9fafb;
+}
+
+.range-buttons button.active {
+  background: #111827;
+  color: #ffffff;
+  border-color: #111827;
+}
+
+/* =========================
+   CUSTOM RANGE INLINE
+========================= */
+
 .custom-range {
   display: flex;
-  gap: 12px;
   align-items: center;
-  margin: 10px 0 18px;
-  padding: 14px;
-  border-radius: 14px;
-  border: 1px solid #e5e7eb;
-  background: #ffffff;
+  gap: 8px;
 }
 
-.date-field {
-  width: 180px;
+.custom-range .range-input {
+  width: 260px;
 }
 
+/* Normalize material height */
+.custom-range .mat-form-field-flex {
+  height: 36px;
+  align-items: center;
+}
+
+/* Apply button */
 .apply-btn {
-  height: 44px;
-  padding: 0 18px;
-  border-radius: 12px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: none;
+  background: #111827;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
-/* KPIs */
+.apply-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+
+/* =========================
+   KPI ROW
+========================= */
+
 .kpi-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -96,7 +145,10 @@
   border-color: rgba(110, 146, 119, 0.35);
 }
 
-/* Segmented tabs */
+/* =========================
+   SEGMENTED TABS
+========================= */
+
 .segmented-tabs {
   display: inline-flex;
   padding: 4px;
@@ -122,7 +174,10 @@
   color: #111827;
 }
 
-/* Main content surface */
+/* =========================
+   CONTENT SURFACE
+========================= */
+
 .content-surface {
   background: #ffffff;
   border-radius: 18px;
@@ -130,7 +185,10 @@
   padding: 20px;
 }
 
-/* Cards */
+/* =========================
+   CARDS & GRIDS
+========================= */
+
 .chart-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
@@ -170,7 +228,7 @@
 .chart-subtitle {
   font-size: 12px;
   color: #6b7280;
-  margin: 4px 0 0;
+  margin-top: 4px;
 }
 
 .hint {
@@ -178,21 +236,27 @@
   color: #9ca3af;
 }
 
-/* Chart sizing (keeps cards from collapsing) */
+/* =========================
+   CHART SIZING
+========================= */
+
 .chart-wrap {
   height: 320px;
 }
 
 .chart-wrap.small {
-  height: 280px;
+  min-height: 260px;
+  height: auto;
 }
 
 .chart-wrap canvas {
-  width: 100% !important;
-  height: 100% !important;
+  max-height: 320px;
 }
 
-/* Top list */
+/* =========================
+   TOP LIST
+========================= */
+
 .top-list {
   list-style: none;
   padding: 0;
@@ -213,72 +277,53 @@
 }
 
 .name {
-  color: #111827;
   font-size: 13px;
   font-weight: 600;
+  color: #111827;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .val {
-  color: #111827;
   font-weight: 750;
+  color: #111827;
 }
 
-/* Responsive */
+/* =========================
+   RETENTION SUMMARY
+========================= */
+
+.retention-summary {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.retention-summary strong {
+  color: #111827;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
 @media (max-width: 900px) {
   .split-grid {
     grid-template-columns: 1fr;
   }
+
   .chart-wrap {
     height: 280px;
   }
-}
 
-/* Range group */
-.range-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* Select */
-.range-select {
-  min-width: 170px;
-}
-
-/* Inline dates */
-.inline-dates {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding-left: 4px;
-}
-
-/* Date fields */
-.date-field {
-  width: 150px;
-}
-
-/* Separator */
-.date-separator {
-  color: #9ca3af;
-  font-weight: 600;
-  margin: 0 2px;
-}
-
-/* Apply button */
-.apply-inline {
-  height: 44px;
-  padding: 0 16px;
-  border-radius: 12px;
-  font-weight: 600;
-}
-
-/* Responsive */
-@media (max-width: 900px) {
   .range-group {
     flex-wrap: wrap;
+  }
+
+  .inline-dates {
+    width: 100%;
   }
 }
