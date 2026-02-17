@@ -1,57 +1,24 @@
 <!doctype html>
 <html lang="en" data-beasties-container>
-<head><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <meta charset="utf-8">
-  <title>CannaosDash</title>
-
- <script>
+<head>
+  <script>
 (async function () {
 
-  const AUTH_KEY = 'cannaos_auth';
-  const PASSWORD_HASH = 'd832b5545eca44f28d1bc4e10cb75a31ec333514a5eafae034734dd8f12b95b7';
+  const AUTH_KEY = "cannaos_auth";
+
+  const PASSWORD_HASH = "d832b5545eca44f28d1bc4e10cb75a31ec333514a5eafae034734dd8f12b95b7";
 
   async function hash(text) {
     const encoder = new TextEncoder();
     const data = encoder.encode(text);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
     return Array.from(new Uint8Array(hashBuffer))
-      .map(b => b.toString(16).padStart(2, '0'))
-      .join('');
+      .map(b => b.toString(16).padStart(2, "0"))
+      .join("");
   }
 
-  function block() {
-    document.body.innerHTML = `
-      <div style="
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        height:100vh;
-        font-family:DM Sans, sans-serif;
-        background:#fafafa;
-      ">
-        <div style="text-align:center">
-          <h2>Access Restricted</h2>
-          <p>Unauthorized access.</p>
-        </div>
-      </div>
-    `;
-  }
-
-  function loadAngular() {
-    const polyfills = document.createElement('script');
-    polyfills.type = 'module';
-    polyfills.src = 'polyfills-FFHMD2TL.js';
-
-    const main = document.createElement('script');
-    main.type = 'module';
-    main.src = 'main-LGIOIYXZ.js';
-
-    document.body.appendChild(polyfills);
-    document.body.appendChild(main);
-  }
-
-  if (sessionStorage.getItem(AUTH_KEY) === '1') {
-    loadAngular();
+  // Already authenticated this session
+  if (sessionStorage.getItem(AUTH_KEY) === "1") {
     return;
   }
 
@@ -64,13 +31,42 @@
     return block();
   }
 
-  sessionStorage.setItem(AUTH_KEY, '1');
-  loadAngular();
+  sessionStorage.setItem(AUTH_KEY, "1");
+
+  function block() {
+    document.documentElement.innerHTML = `
+      <head>
+        <title>Access Restricted</title>
+        <style>
+          body {
+            margin:0;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            height:100vh;
+            font-family: DM Sans, sans-serif;
+            background:#fafafa;
+          }
+          .card { text-align:center; }
+          h2 { margin-bottom:8px; }
+          p { color:#6b7280; font-size:14px; }
+        </style>
+      </head>
+      <body>
+        <div class="card">
+          <h2>Access Restricted</h2>
+          <p>Unauthorized access.</p>
+        </div>
+      </body>
+    `;
+  }
 
 })();
 </script>
 
-
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <meta charset="utf-8">
+  <title>CannaosDash</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -84,7 +80,5 @@
 
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCZ2NoN-Hp-87pYYmASn1l-7nS49gWWTfI&amp;libraries=drawing"></script>
 
-<link rel="modulepreload" href="chunk-JX3HZ4VP.js">
-<!-- <script src="polyfills-FFHMD2TL.js" type="module"></script><script src="main-LGIOIYXZ.js" type="module"></script> -->
-</body>
+<link rel="modulepreload" href="chunk-JX3HZ4VP.js"><script src="polyfills-FFHMD2TL.js" type="module"></script><script src="main-LGIOIYXZ.js" type="module"></script></body>
 </html>
