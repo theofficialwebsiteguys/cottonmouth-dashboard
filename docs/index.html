@@ -5,52 +5,59 @@
   <title>CannaosDash</title>
 
   <script>
-  (async function () {
+    (async function () {
 
-    const AUTH_KEY = 'cannaos_auth';
+      const AUTH_KEY = 'cannaos_auth';
 
-    // SHA-256 of your password
-    const PASSWORD_HASH = 'REPLACE_WITH_REAL_HASH';
+      const PASSWORD_HASH = '7c4ff521986b4ff3d2ecb4d9b0d7f3c6bb77eb8aad66ec189ef3f8f2bfa6d9cb';
 
-    async function hash(text) {
-      const encoder = new TextEncoder();
-      const data = encoder.encode(text);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-      return Array.from(new Uint8Array(hashBuffer))
-        .map(b => b.toString(16).padStart(2, '0'))
-        .join('');
-    }
+      async function hash(text) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(text);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        return Array.from(new Uint8Array(hashBuffer))
+          .map(b => b.toString(16).padStart(2, '0'))
+          .join('');
+      }
 
-    function block() {
-      document.body.innerHTML = `
-        <div style="
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          height:100vh;
-          font-family:sans-serif;
-        ">
-          <h2>Access Restricted</h2>
-        </div>
-      `;
-      throw new Error("Blocked");
-    }
+      function block() {
+        document.body.innerHTML = `
+          <div style="
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            height:100vh;
+            font-family:DM Sans, sans-serif;
+            background:#fafafa;
+          ">
+            <div style="text-align:center">
+              <h2 style="margin-bottom:10px;">Access Restricted</h2>
+              <p style="color:#6b7280;font-size:14px;">
+                Unauthorized access.
+              </p>
+            </div>
+          </div>
+        `;
+        throw new Error("Blocked");
+      }
 
-    if (sessionStorage.getItem(AUTH_KEY)) return;
+      // Already authenticated this session?
+      if (sessionStorage.getItem(AUTH_KEY) === '1') return;
 
-    const input = prompt("Enter dashboard password");
-    if (!input) block();
+      const input = prompt("Enter dashboard password");
+      if (!input) block();
 
-    const inputHash = await hash(input);
+      const inputHash = await hash(input);
 
-    if (inputHash === PASSWORD_HASH) {
-      sessionStorage.setItem(AUTH_KEY, '1');
-    } else {
-      block();
-    }
+      if (inputHash === PASSWORD_HASH) {
+        sessionStorage.setItem(AUTH_KEY, '1');
+      } else {
+        block();
+      }
 
-  })();
-  </script>
+    })();
+    </script>
+
 
 
   <base href="/">
