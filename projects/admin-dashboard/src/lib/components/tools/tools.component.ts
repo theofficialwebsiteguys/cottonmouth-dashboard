@@ -3,10 +3,11 @@ import { AdminService } from '../../services/admin.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PushNotificationToolComponent } from '../push-notification-tool/push-notification-tool.component';
+import { AnnouncementsComponent } from '../announcements/announcements.component';
 
 @Component({
   selector: 'lib-tools',
-  imports: [CommonModule, FormsModule, PushNotificationToolComponent],
+  imports: [CommonModule, FormsModule, PushNotificationToolComponent, AnnouncementsComponent],
   templateUrl: './tools.component.html',
   styleUrl: './tools.component.css'
 })
@@ -53,7 +54,7 @@ export class ToolsComponent {
 
   addBannerFile?: File;
 
-  tabs: string[] = ['Notifications', 'Banners'];
+  tabs: string[] = ['Notifications', 'Banners', 'Announcements'];
   selectedTab = 0;
 
   isSavingZone: boolean = false;

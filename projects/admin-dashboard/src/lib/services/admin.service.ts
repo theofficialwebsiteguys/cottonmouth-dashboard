@@ -340,4 +340,35 @@ toggleDelivery(): Observable<{ deliveryAvailable: boolean }> {
     });
   }
 
+  getAnnouncements(): Observable<any[]> {
+    return this.http.get<any[]>(
+      `${environment.apiUrl}/businesses/announcements`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  createAnnouncement(data: { title: string; message?: string }): Observable<any> {
+    return this.http.post(
+      `${environment.apiUrl}/businesses/announcements`,
+      data,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  updateAnnouncement(id: string, data: any): Observable<any> {
+    return this.http.put(
+      `${environment.apiUrl}/businesses/announcements/${id}`,
+      data,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  deleteAnnouncement(id: string): Observable<any> {
+    return this.http.delete(
+      `${environment.apiUrl}/businesses/announcements/${id}`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+
 }

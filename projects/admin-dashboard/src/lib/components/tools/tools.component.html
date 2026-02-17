@@ -10,83 +10,22 @@
 
   <!-- TABS -->
   <div class="tabs">
-    <button
-      *ngFor="let tab of tabs; let i = index"
-      [class.active]="selectedTab === i"
-      (click)="selectedTab = i">
+    <button *ngFor="let tab of tabs; let i = index" [class.active]="selectedTab === i" (click)="selectedTab = i">
       {{ tab }}
     </button>
   </div>
 
-  <!-- WORKSPACE -->
   <section class="workspace">
 
-    <!-- ================= NOTIFICATIONS / EMAIL ================= -->
     <ng-container *ngIf="selectedTab === 0">
 
       <div class="grid two">
 
-        <!-- PUSH -->
         <app-push-notification-tool></app-push-notification-tool>
 
-        <!-- EMAIL -->
-        <!-- <div class="card">
-          <div class="card-header">
-            <h2>Email Campaign</h2>
-            <span class="muted">Create and send broadcasts</span>
-          </div>
-
-          <div *ngIf="!emailDomainVerified" class="notice">
-            <strong>Verify sending domain</strong>
-            <input class="input" placeholder="yourdomain.com" [(ngModel)]="emailDomain" />
-            <button class="btn primary" (click)="registerEmailDomain()">Verify</button>
-          </div>
-
- 
-          <ng-container *ngIf="emailDomainVerified">
-            <input class="input" placeholder="Subject" [(ngModel)]="emailSubject" />
-            <textarea class="input" placeholder="Message" [(ngModel)]="emailBody"></textarea>
-
-            <select class="input" [(ngModel)]="targetAudience">
-              <option value="all">All Users</option>
-              <option value="loyalty">Loyalty Members</option>
-              <option value="employees">Employees</option>
-            </select>
-
-            <input type="file" (change)="onFlyerSelected($event)" />
-
-            <div class="actions">
-              <button class="btn ghost" (click)="clearEmailForm()">Clear</button>
-              <button class="btn primary" (click)="createBroadcast()">Save Draft</button>
-            </div>
-          </ng-container>
-        </div> -->
       </div>
-
-      <!-- BROADCASTS -->
-      <!-- <div class="card full">
-        <div class="card-header">
-          <h2>Drafts & Scheduled</h2>
-        </div>
-
-        <div *ngIf="isLoadingBroadcasts" class="muted">Loading…</div>
-
-        <div *ngFor="let b of userBroadcasts" class="row">
-          <div>
-            <strong>{{ b.data.subject }}</strong>
-            <small>{{ formatDate(b.data.created_at) }}</small>
-          </div>
-
-          <div class="row-actions">
-            <button class="btn ghost" (click)="toggleScheduler(b.data.id)">Schedule</button>
-            <button class="btn primary" (click)="scheduleBroadcast(b.data.id, true)">Send</button>
-            <button class="btn danger" (click)="confirmDeleteBroadcast(b.data.id)">Delete</button>
-          </div>
-        </div>
-      </div> -->
     </ng-container>
 
-    <!-- ================= BANNERS ================= -->
     <ng-container *ngIf="selectedTab === 1">
 
       <div class="card full">
@@ -95,125 +34,56 @@
           <span class="muted">Manage carousel images</span>
         </div>
 
-    <div class="banner-grid">
-      <!-- EXISTING BANNERS -->
-      <div *ngFor="let image of carouselImages; let i = index" class="banner-card">
-        <div class="banner-preview">
-          <img [src]="image" alt="Banner {{ i + 1 }}" />
-        </div>
-
-        <div class="banner-footer">
-          <span class="banner-label">Banner {{ i + 1 }}</span>
-        </div>
-
-        <div class="banner-overlay">
-          <label class="btn ghost small">
-            Replace
-            <input type="file" hidden (change)="onImageFileSelected($event, i)" />
-          </label>
-
-          <button class="btn danger small" (click)="deleteImage(i)">
-            Delete
-          </button>
-        </div>
-      </div>
-
-      <!-- ADD NEW BANNER TILE -->
-      <div class="banner-card add">
-        <label class="add-banner">
-          <input type="file" hidden (change)="onAddBannerFileSelected($event)" />
-          <div class="add-inner">
-            <div class="plus">＋</div>
-            <div class="add-title">Add Banner</div>
-            <div class="add-sub">
-              {{ addBannerFile?.name || 'PNG / JPG recommended' }}
-            </div>
-          </div>
-        </label>
-
-        <button
-          class="btn primary small upload-btn"
-          (click)="uploadNewBanner()"
-          [disabled]="!addBannerFile">
-          Upload
-        </button>
-      </div>
-    </div>
-
-
-
-        <!-- <div class="actions">
-          <input type="file" (change)="onAddBannerFileSelected($event)" />
-          <button class="btn primary" (click)="uploadNewBanner()">Add Banner</button>
-        </div> -->
-      </div>
-    </ng-container>
-
-    <!-- ================= EVENTS ================= -->
-    <ng-container *ngIf="selectedTab === 2">
-
-      <div class="grid two">
-        <div class="card">
-          <div class="card-header">
-            <h2>Create Event</h2>
-          </div>
-
-          <input class="input" placeholder="Title" [(ngModel)]="eventTitle" />
-          <textarea class="input" placeholder="Description" [(ngModel)]="eventDescription"></textarea>
-          <input class="input" placeholder="Location" [(ngModel)]="eventLocation" />
-          <input class="input" type="datetime-local" [(ngModel)]="eventDateTime" />
-          <input type="file" (change)="onEventFileSelected($event)" />
-
-          <div class="actions">
-            <button class="btn ghost" (click)="clearEventForm()">Clear</button>
-            <button class="btn primary" (click)="createEvent()">Create</button>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <h2>Events</h2>
-          </div>
-
-          <div *ngFor="let event of events" class="row">
-            <div>
-              <strong>{{ event.title }}</strong>
-              <small>{{ event.dateTime | date:'medium' }}</small>
+        <div class="banner-grid">
+          <div *ngFor="let image of carouselImages; let i = index" class="banner-card">
+            <div class="banner-preview">
+              <img [src]="image" alt="Banner {{ i + 1 }}" />
             </div>
 
-            <div class="row-actions">
-              <button class="btn ghost" (click)="startEditEvent(event)">Edit</button>
-              <button class="btn danger" (click)="deleteEvent(event.id)">Delete</button>
+            <div class="banner-footer">
+              <span class="banner-label">Banner {{ i + 1 }}</span>
+            </div>
+
+            <div class="banner-overlay">
+              <label class="btn ghost small">
+                Replace
+                <input type="file" hidden (change)="onImageFileSelected($event, i)" />
+              </label>
+
+              <button class="btn danger small" (click)="deleteImage(i)">
+                Delete
+              </button>
             </div>
           </div>
-        </div>
-      </div>
-    </ng-container>
 
-    <!-- ================= DELIVERY ================= -->
-    <ng-container *ngIf="selectedTab === 3">
+          <!-- ADD NEW BANNER TILE -->
+          <div class="banner-card add">
+            <label class="add-banner">
+              <input type="file" hidden (change)="onAddBannerFileSelected($event)" />
+              <div class="add-inner">
+                <div class="plus">＋</div>
+                <div class="add-title">Add Banner</div>
+                <div class="add-sub">
+                  {{ addBannerFile?.name || 'PNG / JPG recommended' }}
+                </div>
+              </div>
+            </label>
 
-      <div class="grid two">
-        <div class="card">
-          <h2>Delivery Availability</h2>
-          <label class="toggle">
-            <input type="checkbox" [checked]="deliveryAvailable" (change)="onToggleDelivery()" />
-            <span></span>
-          </label>
-        </div>
-
-        <div class="card full">
-          <h2>Delivery Zones</h2>
-          <div #mapContainer class="map"></div>
-
-          <div class="actions">
-            <button class="btn primary" (click)="saveZone()" [disabled]="isSavingZone">
-              {{ isSavingZone ? 'Saving…' : 'Save Zone' }}
+            <button class="btn primary small upload-btn" (click)="uploadNewBanner()" [disabled]="!addBannerFile">
+              Upload
             </button>
           </div>
         </div>
+
+
       </div>
     </ng-container>
+
+    <ng-container *ngIf="selectedTab === 2">
+      <app-announcements></app-announcements>
+    </ng-container>
+
+
 
   </section>
 </div>

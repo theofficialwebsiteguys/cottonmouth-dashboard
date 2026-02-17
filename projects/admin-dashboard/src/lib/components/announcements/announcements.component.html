@@ -1,0 +1,139 @@
+<div class="announcements-shell">
+
+  <!-- HEADER -->
+  <div class="header">
+
+    <div class="header-left">
+      <h2>
+        <i class="fa-solid fa-bullhorn"></i>
+        Announcements
+      </h2>
+      <p>Manage banners displayed inside the app</p>
+    </div>
+
+    <div class="header-right">
+      <div class="stat-pill">
+        <i class="fa-solid fa-circle"></i>
+        {{ announcements.length }} Active
+      </div>
+    </div>
+
+  </div>
+
+    <!-- LIST -->
+  <div class="list-card">
+
+    <div class="list-header">
+      <h3>Live Announcements</h3>
+    </div>
+
+    <div *ngIf="announcements.length === 0" class="empty">
+      No announcements created yet.
+    </div>
+
+    <div
+      class="announcement-row"
+      *ngFor="let ann of announcements">
+
+      <div class="announcement-content">
+
+        <div class="title-row">
+          <span class="title">{{ ann.title }}</span>
+
+          <span class="badge live">
+            <i class="fa-solid fa-circle"></i>
+            Live
+          </span>
+        </div>
+
+        <div class="subtitle" *ngIf="ann.message">
+          {{ ann.message }}
+        </div>
+
+      </div>
+
+      <div class="row-actions">
+
+        <button
+          class="btn icon"
+          (click)="startEdit(ann)">
+          <i class="fa-solid fa-pen"></i>
+        </button>
+
+        <button
+          class="btn icon danger"
+          (click)="deleteAnnouncement(ann.id)">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- CREATE / EDIT -->
+  <div class="editor-card">
+
+    <div class="editor-header">
+      <h3>
+        <i class="fa-solid"
+           [ngClass]="editingId ? 'fa-pen' : 'fa-plus'">
+        </i>
+        {{ editingId ? 'Edit Announcement' : 'Create Announcement' }}
+      </h3>
+    </div>
+
+    <div class="form-grid">
+
+      <div class="field">
+        <label>Title</label>
+        <input
+          type="text"
+          [(ngModel)]="title"
+          placeholder="Holiday Sale Starts Friday"
+        />
+      </div>
+
+      <div class="field full">
+        <label>Subtitle (optional)</label>
+        <textarea
+          [(ngModel)]="message"
+          placeholder="Enjoy 25% off storewide all weekend."
+        ></textarea>
+      </div>
+
+    </div>
+
+    <div class="editor-actions">
+
+      <button
+        *ngIf="!editingId"
+        class="btn primary full-mobile"
+        (click)="createAnnouncement()">
+        <i class="fa-solid fa-plus"></i>
+        Publish
+      </button>
+
+      <button
+        *ngIf="editingId"
+        class="btn primary full-mobile"
+        (click)="saveEdit()">
+        <i class="fa-solid fa-floppy-disk"></i>
+        Save Changes
+      </button>
+
+      <button
+        *ngIf="editingId"
+        class="btn ghost full-mobile"
+        (click)="cancelEdit()">
+        Cancel
+      </button>
+
+    </div>
+
+  </div>
+
+
+
+</div>
