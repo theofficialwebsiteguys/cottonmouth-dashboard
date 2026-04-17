@@ -482,18 +482,23 @@ textarea.input {
   border-bottom: 1px solid #e5e7eb;
 }
 
+.mode-tab i {
+  display: none;
+}
+
 .mode-tab {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 3px;
-  padding: 7px 2px;
-  font-size: 9.5px;
+  padding: 7px 4px;
+  font-size: 9px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
   white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
   border: none;
   background: transparent;
   color: #9ca3af;
@@ -501,6 +506,7 @@ textarea.input {
   border-bottom: 2px solid transparent;
   transition: color 0.12s ease, border-color 0.12s ease, background 0.12s ease;
   margin-bottom: -1px;
+  min-width: 0;
 }
 
 .mode-tab:hover:not(.active) {
