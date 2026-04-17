@@ -19,6 +19,18 @@
   }
 }
 
+.header-title {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.user-count {
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
 .header-controls {
   display: flex;
   align-items: center;

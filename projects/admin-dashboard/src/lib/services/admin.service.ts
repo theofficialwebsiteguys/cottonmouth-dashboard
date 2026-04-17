@@ -87,29 +87,37 @@ export class AdminService {
     return this.http.post<any>(`${environment.apiUrl}/notifications/sendPushByCategory`, payload, { headers: this.getHeaders() });
   }
 
-  getCarouselImages(): Observable<{ images: string[] }> {
-    const url = `${environment.apiUrl}/notifications/images`;
-  
+  getCarouselImages(): Observable<{ images: string[]; schedules: Record<string, string[]> }> {
+    const url = `${environment.apiUrl}/notifications/images?admin=true`;
     const options = {
       method: 'GET',
       url,
-      headers: { 'x-auth-api-key': environment.db_api_key } // Add headers
+      headers: { 'x-auth-api-key': environment.db_api_key }
     };
-  
     return from(CapacitorHttp.request(options)).pipe(
-      map((response: any) => response.data) // Extract the `data` property
+      map((response: any) => response.data)
     );
   }
 
-  deleteCarouselImage(index: number) {
-    const url = `${environment.apiUrl}/notifications/images/${index}`;
-    const headers = {
-      'x-auth-api-key': environment.db_api_key
-    };
-  
+  saveBannerSchedules(schedules: Record<string, string[]>): Observable<any> {
+    const headers = { 'x-auth-api-key': environment.db_api_key };
+    return this.http.post(`${environment.apiUrl}/notifications/images/schedules`, { schedules }, { headers });
+  }
+
+  deleteCarouselImage(imageUrl: string) {
+    // Extract the basename from the GCS URL (e.g. "carousel3.jpg") and URL-encode it
+    const cleanUrl = imageUrl.split('?')[0];
+    const baseName = cleanUrl.split('/').pop() ?? '';
+    const url = `${environment.apiUrl}/notifications/images/${encodeURIComponent(baseName)}`;
+    const headers = { 'x-auth-api-key': environment.db_api_key };
     return this.http.delete<{ message: string }>(url, { headers });
   }
   
+
+  reorderCarouselImages(imageUrls: string[]): Observable<any> {
+    const headers = { 'x-auth-api-key': environment.db_api_key };
+    return this.http.post(`${environment.apiUrl}/notifications/images/reorder`, { images: imageUrls }, { headers });
+  }
 
   addCarouselImage(file: File) {
     const url = `${environment.apiUrl}/notifications/images/add`;

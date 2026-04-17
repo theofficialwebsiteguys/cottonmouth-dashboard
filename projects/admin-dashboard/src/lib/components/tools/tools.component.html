@@ -34,25 +34,165 @@
           <span class="muted">Manage carousel images</span>
         </div>
 
+        <!-- Unsaved changes bar -->
+        <div class="banner-toolbar" *ngIf="orderChanged || schedulesChanged">
+          <div class="toolbar-left">
+            <i class="fa-solid fa-circle-exclamation toolbar-icon"></i>
+            <span>
+              <span *ngIf="orderChanged">Order</span><span *ngIf="orderChanged && schedulesChanged"> &amp; </span><span *ngIf="schedulesChanged">Schedules</span> updated — save to apply
+            </span>
+          </div>
+          <div class="toolbar-actions">
+            <button class="btn primary small" *ngIf="orderChanged" (click)="saveOrder()" [disabled]="isSavingOrder">
+              <i class="fa-solid fa-arrow-down-up-across-line"></i>
+              {{ isSavingOrder ? 'Saving…' : 'Save Order' }}
+            </button>
+            <button class="btn primary small" *ngIf="schedulesChanged" (click)="saveSchedules()" [disabled]="isSavingSchedules">
+              <i class="fa-solid fa-calendar-check"></i>
+              {{ isSavingSchedules ? 'Saving…' : 'Save Schedules' }}
+            </button>
+          </div>
+        </div>
+
         <div class="banner-grid">
-          <div *ngFor="let image of carouselImages; let i = index" class="banner-card">
+          <div *ngFor="let image of carouselImages; let i = index"
+               class="banner-card"
+               [class.has-schedule]="getBannerMode(getBaseName(image)) === 'specific'"
+               [class.is-hidden]="getBannerMode(getBaseName(image)) === 'hidden'">
+
             <div class="banner-preview">
               <img [src]="image" alt="Banner {{ i + 1 }}" />
+
+              <!-- Hover overlay -->
+              <div class="banner-overlay" *ngIf="confirmDeleteIndex !== i">
+                <label class="overlay-btn">
+                  <i class="fa-solid fa-rotate"></i> Replace
+                  <input type="file" hidden (change)="onImageFileSelected($event, i)" />
+                </label>
+                <button class="overlay-btn danger" (click)="confirmDelete(i)">
+                  <i class="fa-solid fa-trash"></i> Delete
+                </button>
+              </div>
+
+              <!-- Delete confirmation overlay -->
+              <div class="banner-overlay confirm-overlay" *ngIf="confirmDeleteIndex === i">
+                <div class="confirm-inner">
+                  <i class="fa-solid fa-triangle-exclamation confirm-icon"></i>
+                  <span class="confirm-text">Delete this banner?</span>
+                  <div class="confirm-actions">
+                    <button class="overlay-btn danger" (click)="deleteImage(i)">
+                      <i class="fa-solid fa-trash"></i> Yes, Delete
+                    </button>
+                    <button class="overlay-btn" (click)="cancelDelete()">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card-face status strip (shown when editor is closed) -->
+            <div class="card-status" *ngIf="editingScheduleIndex !== i">
+              <ng-container [ngSwitch]="getBannerMode(getBaseName(image))">
+                <div *ngSwitchCase="'every'" class="status-pill every">
+                  <i class="fa-solid fa-infinity"></i> Every Day
+                </div>
+                <div *ngSwitchCase="'hidden'" class="status-pill hidden-pill">
+                  <i class="fa-solid fa-eye-slash"></i> Hidden
+                </div>
+                <div *ngSwitchCase="'specific'" class="status-pill specific">
+                  <i class="fa-regular fa-calendar-days"></i>
+                  <span *ngFor="let d of getSelectedDays(getBaseName(image)); let last = last">
+                    {{ d.slice(0, 3) }}<span *ngIf="!last">, </span>
+                  </span>
+                  <span *ngIf="getSelectedDays(getBaseName(image)).length === 0" class="no-days-warning">
+                    No days — will be hidden
+                  </span>
+                </div>
+              </ng-container>
             </div>
 
             <div class="banner-footer">
               <span class="banner-label">Banner {{ i + 1 }}</span>
+              <div class="footer-actions">
+                <button class="icon-btn"
+                        [class.schedule-active]="getBannerMode(getBaseName(image)) === 'specific'"
+                        [class.schedule-hidden]="getBannerMode(getBaseName(image)) === 'hidden'"
+                        (click)="toggleScheduleEditor(i)"
+                        title="Set schedule">
+                  <i class="fa-regular fa-calendar"></i>
+                </button>
+                <button class="icon-btn" (click)="moveImage(i, 'up')" [disabled]="i === 0" title="Move up">
+                  <i class="fa-solid fa-chevron-up"></i>
+                </button>
+                <button class="icon-btn" (click)="moveImage(i, 'down')" [disabled]="i === carouselImages.length - 1" title="Move down">
+                  <i class="fa-solid fa-chevron-down"></i>
+                </button>
+              </div>
             </div>
 
-            <div class="banner-overlay">
-              <label class="btn ghost small">
-                Replace
-                <input type="file" hidden (change)="onImageFileSelected($event, i)" />
-              </label>
+            <!-- Inline schedule editor -->
+            <div class="schedule-editor" *ngIf="editingScheduleIndex === i">
 
-              <button class="btn danger small" (click)="deleteImage(i)">
-                Delete
-              </button>
+              <!-- Mode selector -->
+              <div class="mode-tabs">
+                <button class="mode-tab"
+                        [class.active]="getBannerMode(getBaseName(image)) === 'every'"
+                        (click)="setBannerMode(getBaseName(image), 'every')">
+                  <i class="fa-solid fa-infinity"></i> Every Day
+                </button>
+                <button class="mode-tab"
+                        [class.active]="getBannerMode(getBaseName(image)) === 'specific'"
+                        (click)="setBannerMode(getBaseName(image), 'specific')">
+                  <i class="fa-regular fa-calendar-days"></i> Specific Days
+                </button>
+                <button class="mode-tab danger-tab"
+                        [class.active]="getBannerMode(getBaseName(image)) === 'hidden'"
+                        (click)="setBannerMode(getBaseName(image), 'hidden')">
+                  <i class="fa-solid fa-eye-slash"></i> Hidden
+                </button>
+              </div>
+
+              <!-- Every Day description -->
+              <div class="mode-body" *ngIf="getBannerMode(getBaseName(image)) === 'every'">
+                <p class="mode-desc">
+                  <i class="fa-solid fa-circle-check"></i>
+                  This banner shows on all days with no restrictions.
+                </p>
+              </div>
+
+              <!-- Hidden description -->
+              <div class="mode-body" *ngIf="getBannerMode(getBaseName(image)) === 'hidden'">
+                <p class="mode-desc warning">
+                  <i class="fa-solid fa-eye-slash"></i>
+                  This banner is hidden and will not appear in the app.
+                </p>
+              </div>
+
+              <!-- Specific day picker -->
+              <div class="mode-body" *ngIf="getBannerMode(getBaseName(image)) === 'specific'">
+                <div class="schedule-days">
+                  <button *ngFor="let day of weekDays"
+                          class="day-btn"
+                          [class.on]="isDaySelected(getBaseName(image), day)"
+                          [class.off]="!isDaySelected(getBaseName(image), day)"
+                          (click)="toggleScheduleDay(getBaseName(image), day)"
+                          [title]="day">
+                    {{ day.slice(0, 3) }}
+                  </button>
+                </div>
+                <div class="day-status"
+                     [class.ok]="getSelectedDays(getBaseName(image)).length > 0"
+                     [class.warn]="getSelectedDays(getBaseName(image)).length === 0">
+                  <ng-container *ngIf="getSelectedDays(getBaseName(image)).length > 0">
+                    <i class="fa-solid fa-eye"></i>
+                    Showing on {{ getSelectedDays(getBaseName(image)).length }} of 7 days
+                  </ng-container>
+                  <ng-container *ngIf="getSelectedDays(getBaseName(image)).length === 0">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    No days selected — banner will be hidden
+                  </ng-container>
+                </div>
+              </div>
+
             </div>
           </div>
 
@@ -61,16 +201,13 @@
             <label class="add-banner">
               <input type="file" hidden (change)="onAddBannerFileSelected($event)" />
               <div class="add-inner">
-                <div class="plus">＋</div>
+                <div class="plus"><i class="fa-solid fa-plus"></i></div>
                 <div class="add-title">Add Banner</div>
-                <div class="add-sub">
-                  {{ addBannerFile?.name || 'PNG / JPG recommended' }}
-                </div>
+                <div class="add-sub">{{ addBannerFile?.name || 'PNG / JPG recommended' }}</div>
               </div>
             </label>
-
             <button class="btn primary small upload-btn" (click)="uploadNewBanner()" [disabled]="!addBannerFile">
-              Upload
+              <i class="fa-solid fa-upload"></i> Upload
             </button>
           </div>
         </div>

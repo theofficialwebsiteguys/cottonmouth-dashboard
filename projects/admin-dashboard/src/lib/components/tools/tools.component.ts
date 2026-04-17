@@ -53,6 +53,20 @@ export class ToolsComponent {
   };
 
   addBannerFile?: File;
+  confirmDeleteIndex: number | null = null;
+  orderChanged: boolean = false;
+  isSavingOrder: boolean = false;
+
+  bannerSchedules: Record<string, string[]> = {};
+  // 'every' = no restriction (schedule saved as [])
+  // 'specific' = only show on selected days
+  // 'hidden' = never show (schedule saved as special marker ['__hidden__'])
+  bannerModes: Record<string, 'every' | 'specific' | 'hidden'> = {};
+  editingScheduleIndex: number | null = null;
+  schedulesChanged: boolean = false;
+  isSavingSchedules: boolean = false;
+
+  readonly weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
   tabs: string[] = ['Notifications', 'Banners', 'Announcements'];
   selectedTab = 0;
@@ -171,7 +185,23 @@ export class ToolsComponent {
 
   loadCarouselImages() {
     this.adminService.getCarouselImages().subscribe(response => {
-      this.carouselImages = response.images.map(imgUrl => `${imgUrl}?v=${new Date().getTime()}`);
+      const sorted = [...response.images].sort((a, b) => {
+        const aNum = Number.parseInt(/carousel(\d+)\./.exec(a)?.[1] ?? '0');
+        const bNum = Number.parseInt(/carousel(\d+)\./.exec(b)?.[1] ?? '0');
+        return aNum - bNum;
+      });
+      this.carouselImages = sorted.map(imgUrl => `${imgUrl}?v=${Date.now()}`);
+      this.bannerSchedules = response.schedules ?? {};
+      this.bannerModes = {};
+      Object.entries(this.bannerSchedules).forEach(([name, days]) => {
+        if (days.includes('__hidden__')) {
+          this.bannerModes[name] = 'hidden';
+        } else if (days.length > 0) {
+          this.bannerModes[name] = 'specific';
+        } else {
+          this.bannerModes[name] = 'every';
+        }
+      });
     });
   }
 
@@ -341,20 +371,115 @@ createEvent() {
   }
   
 
+  confirmDelete(index: number) {
+    this.confirmDeleteIndex = index;
+  }
+
+  cancelDelete() {
+    this.confirmDeleteIndex = null;
+  }
+
   deleteImage(index: number) {
-    if (confirm(`Are you sure you want to delete Carousel ${index + 1}?`)) {
-      this.adminService.deleteCarouselImage(index).subscribe({
-        next: (res) => {
-          console.log(res.message);
-          this.carouselImages[index] = ''; // Or remove it if you want
-          this.expandedIndex = null;
-          this.loadCarouselImages(); // Refresh the image list
-        },
-        error: (err) => {
-          console.error('Error deleting image:', err);
-        }
-      });
+    const imageUrl = this.carouselImages[index];
+    this.adminService.deleteCarouselImage(imageUrl).subscribe({
+      next: (res) => {
+        console.log(res.message);
+        this.confirmDeleteIndex = null;
+        this.expandedIndex = null;
+        this.loadCarouselImages();
+      },
+      error: (err) => {
+        console.error('Error deleting image:', err);
+        this.confirmDeleteIndex = null;
+      }
+    });
+  }
+
+  moveImage(index: number, direction: 'up' | 'down') {
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= this.carouselImages.length) return;
+
+    const temp = this.carouselImages[index];
+    this.carouselImages[index] = this.carouselImages[newIndex];
+    this.carouselImages[newIndex] = temp;
+    this.orderChanged = true;
+  }
+
+  saveOrder() {
+    this.isSavingOrder = true;
+    const cleanUrls = this.carouselImages.map(url => url.split('?')[0]);
+    this.adminService.reorderCarouselImages(cleanUrls).subscribe({
+      next: () => {
+        this.orderChanged = false;
+        this.loadCarouselImages();
+      },
+      error: (err: any) => console.error('Error saving order:', err),
+      complete: () => { this.isSavingOrder = false; }
+    });
+  }
+
+  getBaseName(url: string): string {
+    return url.split('?')[0].split('/').pop() ?? '';
+  }
+
+  toggleScheduleEditor(index: number) {
+    this.editingScheduleIndex = this.editingScheduleIndex === index ? null : index;
+  }
+
+  getBannerMode(baseName: string): 'every' | 'specific' | 'hidden' {
+    return this.bannerModes[baseName] ?? 'every';
+  }
+
+  setBannerMode(baseName: string, mode: 'every' | 'specific' | 'hidden') {
+    this.bannerModes[baseName] = mode;
+    if (mode === 'every') {
+      this.bannerSchedules[baseName] = [];
+    } else if (mode === 'hidden') {
+      this.bannerSchedules[baseName] = ['__hidden__'];
+    } else {
+      // Switch to specific: pre-select all 7 so admin starts from "all on, turn off what you don't want"
+      const current = this.bannerSchedules[baseName] ?? [];
+      const validDays = current.filter(d => this.weekDays.includes(d));
+      this.bannerSchedules[baseName] = validDays.length > 0 ? validDays : [...this.weekDays];
     }
+    this.schedulesChanged = true;
+  }
+
+  isDaySelected(baseName: string, day: string): boolean {
+    const schedule = this.bannerSchedules[baseName] ?? [];
+    return schedule.includes(day);
+  }
+
+  getSelectedDays(baseName: string): string[] {
+    const schedule = this.bannerSchedules[baseName] ?? [];
+    return schedule.filter(d => this.weekDays.includes(d));
+  }
+
+  toggleScheduleDay(baseName: string, day: string) {
+    const current = this.bannerSchedules[baseName] ?? [];
+    if (current.includes(day)) {
+      this.bannerSchedules[baseName] = current.filter(d => d !== day);
+    } else {
+      this.bannerSchedules[baseName] = [...current, day];
+    }
+    this.schedulesChanged = true;
+  }
+
+  // kept for template backwards-compat (chips on card face still use this)
+  getActiveDays(baseName: string): string[] {
+    if (this.getBannerMode(baseName) !== 'specific') return [];
+    return this.getSelectedDays(baseName);
+  }
+
+  saveSchedules() {
+    this.isSavingSchedules = true;
+    this.adminService.saveBannerSchedules(this.bannerSchedules).subscribe({
+      next: () => {
+        this.schedulesChanged = false;
+      },
+      error: (err: any) => console.error('Error saving schedules:', err),
+      complete: () => { this.isSavingSchedules = false; }
+    });
   }
 
   onAddBannerFileSelected(event: any) {
@@ -587,38 +712,38 @@ createEvent() {
     this.emailDomainSubmitted = true;
     this.domainVerificationPending = true;
 
-    this.adminService.registerEmailDomain(this.emailDomain).subscribe({
-      next: (res) => {
-        console.log('Domain registered, checking verification...');
-        this.getDomainVerification();
-      },
-      error: (err) => {
-        console.error('Error registering domain:', err);
-        this.emailDomainSubmitted = false;
-        this.domainVerificationPending = false;
-      }
-    });
+    // this.adminService.registerEmailDomain(this.emailDomain).subscribe({
+    //   next: (res) => {
+    //     console.log('Domain registered, checking verification...');
+    //     this.getDomainVerification();
+    //   },
+    //   error: (err) => {
+    //     console.error('Error registering domain:', err);
+    //     this.emailDomainSubmitted = false;
+    //     this.domainVerificationPending = false;
+    //   }
+    // });
   }
 
   getDomainVerification() {
-    this.adminService.getSavedEmailDomainStatus().subscribe({
-      next: (res) => {
-        const isVerified = res.status === 'verified';
+    // this.adminService.getSavedEmailDomainStatus().subscribe({
+    //   next: (res) => {
+    //     const isVerified = res.status === 'verified';
 
-        this.emailDomainVerified = isVerified;
-        this.domainVerificationPending = !isVerified;
-        this.emailDomainSubmitted = true;
+    //     this.emailDomainVerified = isVerified;
+    //     this.domainVerificationPending = !isVerified;
+    //     this.emailDomainSubmitted = true;
 
-        if (isVerified) {
-          setTimeout(() => {
-            this.getAudienceThenBroadcasts();
-          }, 1000); // 600ms delay to avoid rate limit
-        }
-      },
-      error: (err) => {
-        console.error('Error polling domain verification:', err);
-      }
-    });
+    //     if (isVerified) {
+    //       setTimeout(() => {
+    //         this.getAudienceThenBroadcasts();
+    //       }, 1000); // 600ms delay to avoid rate limit
+    //     }
+    //   },
+    //   error: (err) => {
+    //     console.error('Error polling domain verification:', err);
+    //   }
+    // });
   }
 
   getAudienceThenBroadcasts() {
