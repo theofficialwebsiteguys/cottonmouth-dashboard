@@ -185,12 +185,7 @@ export class ToolsComponent {
 
   loadCarouselImages() {
     this.adminService.getCarouselImages().subscribe(response => {
-      const sorted = [...response.images].sort((a, b) => {
-        const aNum = Number.parseInt(/carousel(\d+)\./.exec(a)?.[1] ?? '0');
-        const bNum = Number.parseInt(/carousel(\d+)\./.exec(b)?.[1] ?? '0');
-        return aNum - bNum;
-      });
-      this.carouselImages = sorted.map(imgUrl => `${imgUrl}?v=${Date.now()}`);
+      this.carouselImages = response.images.map(imgUrl => `${imgUrl}?v=${Date.now()}`);
       this.bannerSchedules = response.schedules ?? {};
       this.bannerModes = {};
       Object.entries(this.bannerSchedules).forEach(([name, days]) => {
