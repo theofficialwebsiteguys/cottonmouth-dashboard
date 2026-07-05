@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, catchError, Observable, tap, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment.prod'
 import { ConfigService } from './config.service';
 
@@ -80,25 +80,51 @@ export class DataService {
     const url = `${environment.apiUrl}/orders/`;
     console.log("Fetching Orders from:", url); // Debugging
 
-    return this.http.get<any[]>(url, { headers: this.getHeaders() }).pipe(
-      tap(data => {
-        console.log("Fetched Orders:", data); // Debugging
-        if (data && Array.isArray(data)) {
-          // Convert total_amount to number
-          const formattedData = data.map(order => ({
-            ...order,
-            total_amount: parseFloat(order.total_amount) || 0
-          }));
-          this.ordersSubject.next(formattedData);
-        } else {
-          console.warn("Unexpected Orders API Response:", data);
-          this.ordersSubject.next([]);
-        }
+    return this.fetchAllOrderPages(url, 1, []).pipe(
+      tap(orders => {
+        console.log("Fetched Orders:", orders); // Debugging
+        // Convert total_amount to number
+        const formattedData = orders.map(order => ({
+          ...order,
+          total_amount: parseFloat(order.total_amount) || 0
+        }));
+        this.ordersSubject.next(formattedData);
       }),
       catchError(err => {
         console.error("Error Fetching Orders:", err);
+        this.ordersSubject.next([]);
         return throwError(() => err);
       })
     );
+  }
+
+  // The API paginates orders (data + meta.totalPages) to avoid loading the
+  // whole table into memory at once. Walk every page so the dashboard keeps
+  // seeing the full order history it filters/aggregates client-side.
+  private fetchAllOrderPages(url: string, page: number, accumulated: any[]): Observable<any[]> {
+    return this.http
+      .get<any>(url, { headers: this.getHeaders(), params: { page, limit: 1000 } })
+      .pipe(
+        switchMap(response => {
+          // Support both the paginated { data, meta } shape and a plain array,
+          // in case an endpoint/environment hasn't been migrated yet.
+          const pageOrders = Array.isArray(response) ? response : (response?.data ?? []);
+          const combined = accumulated.concat(pageOrders);
+          const totalPages = response?.meta?.totalPages ?? 1;
+
+          if (page < totalPages) {
+            return this.fetchAllOrderPages(url, page + 1, combined);
+          }
+          return of(combined);
+        }),
+        catchError(err => {
+          // The API 404s when a business has zero matching orders — treat
+          // that as an empty list instead of a hard failure.
+          if (err?.status === 404) {
+            return of(accumulated);
+          }
+          return throwError(() => err);
+        })
+      );
   }
 }

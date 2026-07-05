@@ -1,69 +1,6 @@
 <!doctype html>
 <html lang="en" data-beasties-container>
-<head>
-   <script>
-(async function () {
-
-  const AUTH_KEY = "cannaos_auth";
-
-  const PASSWORD_HASH = "d832b5545eca44f28d1bc4e10cb75a31ec333514a5eafae034734dd8f12b95b7";
-
-  async function hash(text) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(text);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    return Array.from(new Uint8Array(hashBuffer))
-      .map(b => b.toString(16).padStart(2, "0"))
-      .join("");
-  }
-
-  // Already authenticated this session
-  if (sessionStorage.getItem(AUTH_KEY) === "1") {
-    return;
-  }
-
-  const input = prompt("Enter dashboard password");
-  if (!input) return block();
-
-  const inputHash = await hash(input);
-
-  if (inputHash !== PASSWORD_HASH) {
-    return block();
-  }
-
-  sessionStorage.setItem(AUTH_KEY, "1");
-
-  function block() {
-    document.documentElement.innerHTML = `
-      <head>
-        <title>Access Restricted</title>
-        <style>
-          body {
-            margin:0;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            height:100vh;
-            font-family: DM Sans, sans-serif;
-            background:#fafafa;
-          }
-          .card { text-align:center; }
-          h2 { margin-bottom:8px; }
-          p { color:#6b7280; font-size:14px; }
-        </style>
-      </head>
-      <body>
-        <div class="card">
-          <h2>Access Restricted</h2>
-          <p>Unauthorized access.</p>
-        </div>
-      </body>
-    `;
-  }
-
-})();
-</script>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<head><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <meta charset="utf-8">
   <title>CannaosDash</title>
   <base href="/">
@@ -79,5 +16,5 @@
 
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCZ2NoN-Hp-87pYYmASn1l-7nS49gWWTfI&amp;libraries=drawing"></script>
 
-<link rel="modulepreload" href="chunk-5Q7HNRTF.js"><script src="polyfills-FFHMD2TL.js" type="module"></script><script src="main-PDFNPDNI.js" type="module"></script></body>
+<link rel="modulepreload" href="chunk-MT76J47E.js"><script src="polyfills-FFHMD2TL.js" type="module"></script><script src="main-UPTXUGB3.js" type="module"></script></body>
 </html>
